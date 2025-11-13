@@ -793,7 +793,7 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
       setAudioUrl(url);
     } catch (error) {
       handleError(error, "Failed to generate audio.");
-    } finally {
+  _   } finally {
       setIsLoading(false);
     }
   };
@@ -891,8 +891,8 @@ It is forbidden to add any other text besides "EDUSTAR".`;
     switch (step) {
       case 'topic':
         return (
-          // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
-          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+          // *** FIX: Reduced vertical spacing from space-y-3 to space-y-2.5 ***
+          <div className="space-y-2.5 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">1. Start with a Topic</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Enter a topic to research, or let us suggest what's trending.</p>
             <div className="relative">
@@ -926,11 +926,12 @@ It is forbidden to add any other text besides "EDUSTAR".`;
 
       case 'topic_select':
         return (
-          // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
-          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+          // *** FIX: Reduced vertical spacing from space-y-3 to space-y-2.5 ***
+          <div className="space-y-2.5 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">2. Choose Your Topic</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Select one of these AI-generated video ideas.</p>
-            <div className="space-y-3 max-h-96 overflow-y-auto">
+            {/* *** FIX: Reduced list item spacing from space-y-3 to space-y-2.5 *** */}
+            <div className="space-y-2.5 max-h-96 overflow-y-auto">
               {suggestedTopics.map((topic, index) => {
                 // Check if topic is an object (from research) or a string (from suggestions)
                 // NEW: Updated logic to check for source_url
@@ -979,17 +980,17 @@ It is forbidden to add any other text besides "EDUSTAR".`;
         
       case 'script_length':
         return (
-          // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
-          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+          // *** FIX: Reduced vertical spacing from space-y-3 to space-y-2.5 ***
+          <div className="space-y-2.5 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">3. Set Script Length</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-medium break-words">Topic: <span className="font-normal">{selectedTopic}</span></p>
-            {/* *** FIX: Reduced grid gap from gap-3 to gap-2.5 *** */}
-            <div className="grid grid-cols-2 gap-2.5">
+            {/* *** FIX: Reduced grid gap from gap-2.5 to gap-2 *** */}
+            <div className="grid grid-cols-2 gap-2">
               {['5', '10', '15', '20'].map(len => (
                 <button
                   key={len}
                   onClick={() => setScriptLength(len)}
-                  // *** FIX: Added flex, justify-center, items-center to fix alignment ***
+                  // *** FIX: Added flex, justify-center, items-center to ALL states ***
                   className={`flex justify-center items-center p-2.5 sm:p-3 rounded-lg border-2 text-sm sm:text-base ${scriptLength === len ? 'bg-blue-600 border-blue-700 text-white' : 'bg-white border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600'}`}
                 >
                     {/* *** FIX: Split number and text for better alignment *** */}
@@ -1032,8 +1033,8 @@ It is forbidden to add any other text besides "EDUSTAR".`;
         
       case 'script_review':
         return (
-          // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
-          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+          // *** FIX: Reduced vertical spacing from space-y-3 to space-y-2.5 ***
+          <div className="space-y-2.5 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">4. Review Your Script</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Check the script and make any edits you need.</p>
             <textarea
@@ -1043,7 +1044,8 @@ It is forbidden to add any other text besides "EDUSTAR".`;
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:rows-12"
             />
             <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100">Next Step: AI Voice</h3>
-            <div className="flex flex-col sm:flex-row gap-3">
+            {/* *** FIX: Reduced button gap from gap-3 to gap-2.5 *** */}
+            <div className="flex flex-col sm:flex-row gap-2.5">
               <button
                 onClick={() => handleGenerateVoice('men')}
                 disabled={isLoading}
@@ -1073,8 +1075,8 @@ It is forbidden to add any other text besides "EDUSTAR".`;
                 >
                   <Download className="w-5 h-5 mr-2" />
                   Download Audio
-                </a>
-              </div>
+          T     </a>
+  _         </div>
          )}
             <button
               onClick={handleSkipToMetadata}
@@ -1087,14 +1089,14 @@ It is forbidden to add any other text besides "EDUSTAR".`;
               className="w-full text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               &larr; Back
-            </button>
+        F   </button>
           </div>
         );
         
       case 'metadata_review':
         return (
-          // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
-          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+          // *** FIX: Reduced vertical spacing from space-y-3 to space-y-2.5 ***
+          <div className="space-y-2.5 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">5. Viral Metadata</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Here's your title, description, and hashtags. Copy them easily!</p>
             <CopyableOutput title="Viral YouTube Title" content={generatedTitle} rows={2} />
@@ -1109,7 +1111,7 @@ It is forbidden to add any other text besides "EDUSTAR".`;
               Generate Thumbnail
             </button>
              <button
-              onClick={() => setStep('script_review')}
+E             onClick={() => setStep('script_review')}
               className="w-full text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               &larr; Back
@@ -1119,21 +1121,21 @@ It is forbidden to add any other text besides "EDUSTAR".`;
         
       case 'thumbnail':
         return (
-          // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
-          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+          // *** FIX: Reduced vertical spacing from space-y-3 to space-y-2.5 ***
+          <div className="space-y-2.5 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">6. Your Thumbnail</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Generated at 1280x720 (YouTube's standard 16:9 ratio).</p>
             {thumbnailUrl && (
               // This container is perfect for responsiveness, no changes needed
               <div className="w-full aspect-[16/9] rounded-lg shadow-lg overflow-hidden border border-gray-300 dark:border-gray-600">
-                <img src={thumbnailUrl} alt="Generated Thumbnail" className="w-full h-full object-cover" />
+S               <img src={thumbnailUrl} alt="Generated Thumbnail" className="w-full h-full object-cover" />
               </div>
             )}
             <button
               onClick={handleGenerateThumbnail}
               disabled={isLoading}
               className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
-            >
+T         >
               <ImageIcon className="w-5 h-5 mr-2" />
               Generate Another One
             </button>
