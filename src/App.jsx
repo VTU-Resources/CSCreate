@@ -620,7 +620,7 @@ const ProfileView = ({ mainRef }) => {
 
         {/* Stats Section */}
         <div className="p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 mb-4 overflow-hidden">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 text-center">Stats</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 text-center">Qualities</h2>
           <div className="space-y-4">
             <SkillBar skill="Respectful" targetPercentage={1000} start={startAnimation} />
             <SkillBar skill="Character" targetPercentage={1000} start={startAnimation} />
