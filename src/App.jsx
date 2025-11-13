@@ -420,10 +420,17 @@ const UpdatesView = () => {
 
 // --- New Profile Page & Sub-Views ---
 
-const ProfileView = () => {
+const ProfileView = ({ mainRef }) => {
   const { theme, toggleTheme } = useTheme();
   // State to manage sub-pages: 'main', 'settings', 'privacy'
   const [profileView, setProfileView] = useState('main');
+
+  // *** FIX: Scroll to top when sub-view changes ***
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo(0, 0);
+    }
+  }, [profileView, mainRef]);
 
   // --- Skill Bar Component with Animation ---
   const SkillBar = ({ skill, targetPercentage, start }) => {
@@ -519,39 +526,52 @@ const ProfileView = () => {
   );
 
   // --- Sub-Page Views ---
-  const SettingsPage = () => (
-    <div className="p-1 sm:p-4">
-      {/* Reduced text size and margin */}
-      <button onClick={() => setProfileView('main')} className="flex items-center text-blue-600 dark:text-blue-400 font-semibold mb-4 text-base">
-        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 mr-1" /> Back to Profile
-      </button>
-      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6">Settings</h1>
-      
-      <div className="space-y-4">
-        <ProfileButton icon={Languages} label="Language" onClick={() => {}} />
-        <ProfileButton icon={Database} label="Manage Storage" onClick={() => {}} />
-        <ProfileButton icon={Trash2} label="Clear Cache" onClick={() => {}} />
-
-        {/* Reduced padding and text size */}
-        <div className="p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
-           <div className="flex justify-between items-center">
-             <div className="flex items-center">
-               <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 mr-4" />
-               <span className="text-gray-700 dark:text-gray-300 font-bold text-base sm:text-lg">Notifications</span>
-             </div>
-             <div className="relative inline-block w-11 align-middle select-none transition duration-200 ease-in flex-shrink-0">
-                <input type="checkbox" name="toggle" id="toggle" className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer dark:bg-gray-900"/>
-                <label htmlFor="toggle" className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer dark:bg-gray-600"></label>
-             </div>
-           </div>
-        </div>
+  const SettingsPage = () => {
+    // *** FIX: Added state for the notification toggle ***
+    const [notifications, setNotifications] = useState(true);
+    
+    return (
+      <div className="p-1 sm:p-4">
+        {/* Reduced text size and margin */}
+        <button onClick={() => setProfileView('main')} className="flex items-center text-blue-600 dark:text-blue-400 font-semibold mb-4 text-base">
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 mr-1" /> Back to Profile
+        </button>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6">Settings</h1>
         
-        <div className="text-center text-gray-500 dark:text-gray-400 text-sm pt-8">
-          <p>App Version 1.0.0</p>
+        <div className="space-y-4">
+          <ProfileButton icon={Languages} label="Language" onClick={() => {}} />
+          <ProfileButton icon={Database} label="Manage Storage" onClick={() => {}} />
+          <ProfileButton icon={Trash2} label="Clear Cache" onClick={() => {}} />
+
+          {/* Reduced padding and text size */}
+          <div className="p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+             <div className="flex justify-between items-center">
+               <div className="flex items-center">
+                 <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 mr-4" />
+                 <span className="text-gray-700 dark:text-gray-300 font-bold text-base sm:text-lg">Notifications</span>
+               </div>
+               <div className="relative inline-block w-11 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+                  {/* *** FIX: Made this a controlled component *** */}
+                  <input 
+                    type="checkbox" 
+                    name="toggle" 
+                    id="toggle" 
+                    className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer dark:bg-gray-900"
+                    checked={notifications}
+                    onChange={() => setNotifications(prev => !prev)}
+                  />
+                  <label htmlFor="toggle" className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer dark:bg-gray-600"></label>
+               </div>
+             </div>
+          </div>
+          
+          <div className="text-center text-gray-500 dark:text-gray-400 text-sm pt-8">
+            <p>App Version 1.0.0</p>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const PrivacyPolicyPage = () => (
     <div className="p-1 sm:p-4">
@@ -753,6 +773,88 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
       handleError(error, "Failed to generate script.");
     } finally {
       setIsLoading(false);
+    }
+  };
+  
+  const handleGenerateVoice = async (gender) => {
+    setIsLoading(true);
+    setLoadingMessage('Generating AI voice...');
+    setErrorMessage('');
+  
+    // Voices: 'Kore' (firmer, lower), 'Puck' (upbeat, higher)
+    const voiceName = gender === 'men' ? 'Kore' : 'Puck'; 
+    
+    try {
+      const { audioData, sampleRate } = await callTtsApi(generatedScript, voiceName);
+      const pcmBuffer = base64ToArrayBuffer(audioData);
+      const pcm16 = new Int16Array(pcmBuffer);
+      const wavBlob = pcmToWav(pcm16, sampleRate);
+      const url = URL.createObjectURL(wavBlob);
+      setAudioUrl(url);
+    } catch (error) {
+      handleError(error, "Failed to generate audio.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleGenerateMetadata = async () => {
+    metadataFetchedRef.current = true; // Mark as fetched
+    setIsLoading(true);
+    setLoadingMessage('Generating viral metadata...');
+    setErrorMessage('');
+    
+    const systemPrompt = "You are a YouTube SEO expert, specialized in creating viral titles, descriptions, and hashtags. Respond *only* with a valid JSON object with keys: 'title' (string), 'description' (string), 'hashtags' (string). The 'hashtags' value should be a single string of 10+ space-separated hashtags (e.g., '#topic #viral #youtube').";
+    const userQuery = `Generate a viral YouTube title, a compelling description, and 10+ high-traffic hashtags for a video about "${selectedTopic}". Use this script summary: "${generatedScript.substring(0, 800)}..."`;
+    
+    try {
+      const text = await callGeminiApi(userQuery, systemPrompt, true); // Use grounding for current trends
+      const cleanedText = cleanApiResponse(text); // Clean the response
+      const data = JSON.parse(cleanedText); // Parse the cleaned text
+      setGeneratedTitle(data.title || '');
+      setGeneratedDescription(data.description || '');
+      setGeneratedHashtags(data.hashtags || '');
+      setStep('metadata_review');
+    } catch (error) {
+      handleError(error, "Failed to generate metadata. The API might have returned an invalid format.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Auto-run metadata generation when moving to that step
+  useEffect(() => {
+    if (step === 'metadata_review' && !metadataFetchedRef.current) {
+      handleGenerateMetadata();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+  
+  const handleSkipToMetadata = () => {
+    setAudioUrl(''); // Clear any previously generated audio
+    setStep('metadata_review');
+  };
+  
+  const handleGenerateThumbnail = async () => {
+    setIsLoading(true);
+    setLoadingMessage('Generating 1280x720 thumbnail...');
+    setErrorMessage('');
+    
+    // NEW: Final locked prompt
+    const prompt = `Create a realistic, 4K HD, professional YouTube thumbnail for the selected topic ("${selectedTopic}").
+The final dimension must be exactly 1280x720 pixels (16:9 aspect ratio).
+It MUST include the text "EDUSTAR" as a small, clean logo or watermark.
+It must feature compelling, high-quality, realistic, viral-themed imagery related to the topic.
+It is forbidden to add any other text besides "EDUSTAR".`;
+    
+    try {
+      const base64Data = await callImagenApi(prompt);
+      setThumbnailUrl(`data:image/png;base64,${base64Data}`);
+      setStep('thumbnail'); // Move to the final step
+    } catch (error) {
+      handleError(error, "Failed to generate thumbnail.");
+    } finally {
+      setIsLoading(false);
    }
   };
 
@@ -789,11 +891,9 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
     switch (step) {
       case 'topic':
         return (
-          // *** MODIFIED: Reduced padding from p-4 to p-3 ***
-          <div className="space-y-4 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
-            {/* *** MODIFIED: Reduced text size from text-xl to text-lg sm:text-xl *** */}
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">1. Start with a Topic</h2>
-            {/* *** MODIFIED: Reduced text size to text-sm sm:text-base *** */}
+          // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
+          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">1. Start with a Topic</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Enter a topic to research, or let us suggest what's trending.</p>
             <div className="relative">
               <input
@@ -801,7 +901,6 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
                 value={topicQuery}
                 onChange={(e) => setTopicQuery(e.target.value)}
                 placeholder="e.g., 'Today's Education news on VTU'"
-                // *** MODIFIED: Reduced padding and text size for mobile ***
                 className="w-full p-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm sm:text-base"
               />
               <Search className="absolute w-5 h-5 text-gray-400 left-3 top-1/2 -translate-y-1/2" />
@@ -809,7 +908,6 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
             <button
               onClick={() => handleFetchTopics(false)}
               disabled={isLoading}
-                // *** MODIFIED: Reduced padding and text size for mobile ***
               className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
             >
               <Search className="w-5 h-5 mr-2" />
@@ -818,7 +916,6 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
             <button
               onClick={() => handleFetchTopics(true)}
               disabled={isLoading}
-                // *** MODIFIED: Reduced padding and text size for mobile ***
               className="w-full bg-purple-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-purple-700 disabled:bg-gray-400 flex items-center justify-center"
             >
               <Sparkles className="w-5 h-5 mr-2" />
@@ -829,11 +926,9 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
 
       case 'topic_select':
         return (
-          // *** MODIFIED: Reduced padding from p-4 to p-3 ***
-          <div className="space-y-4 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
-            {/* *** MODIFIED: Reduced text size from text-xl to text-lg sm:text-xl *** */}
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">2. Choose Your Topic</h2>
-            {/* *** MODIFIED: Reduced text size to text-sm sm:text-base *** */}
+          // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
+          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">2. Choose Your Topic</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Select one of these AI-generated video ideas.</p>
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {suggestedTopics.map((topic, index) => {
@@ -842,7 +937,6 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
                 const isResearchResult = typeof topic === 'object' && topic.title && topic.snippet;
                 
                 return (
-                  // *** MODIFIED: Reduced padding from p-3 to p-2.5 sm:p-3 ***
                   <div key={index} className="w-full p-2.5 sm:p-3 bg-white border border-gray-200 rounded-lg shadow-sm transition-all dark:bg-gray-700 dark:border-gray-600">
                     <button
                       onClick={() => handleSelectTopic(topic)}
@@ -850,9 +944,7 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
                     >
                     {isResearchResult ? (
                       <>
-                        {/* *** MODIFIED: Set explicit text size *** */}
                         <span className="font-bold text-base text-blue-700 dark:text-blue-400 break-words">{topic.title}</span>
-                        {/* *** MODIFIED: Reduced text size from text-sm to text-xs sm:text-sm *** */}
                         <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1 italic break-words">"{topic.snippet}"</p>
                       </>
                     ) : (
@@ -887,27 +979,27 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
         
       case 'script_length':
         return (
-          // *** MODIFIED: Reduced padding from p-4 to p-3 ***
-          <div className="space-y-4 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
-            {/* *** MODIFIED: Reduced text size from text-xl to text-lg sm:text-xl *** */}
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">3. Set Script Length</h2>
-            {/* *** MODIFIED: Reduced text size to text-sm sm:text-base *** */}
+          // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
+          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">3. Set Script Length</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-medium break-words">Topic: <span className="font-normal">{selectedTopic}</span></p>
-            <div className="grid grid-cols-2 gap-3">
+            {/* *** FIX: Reduced grid gap from gap-3 to gap-2.5 *** */}
+            <div className="grid grid-cols-2 gap-2.5">
               {['5', '10', '15', '20'].map(len => (
                 <button
                   key={len}
                   onClick={() => setScriptLength(len)}
-                  // *** MODIFIED: Reduced padding and text size for mobile ***
-                  className={`p-2.5 sm:p-3 rounded-lg border-2 text-sm sm:text-base ${scriptLength === len ? 'bg-blue-600 border-blue-700 text-white' : 'bg-white border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600'}`}
+                  // *** FIX: Added flex, justify-center, items-center to fix alignment ***
+                  className={`flex justify-center items-center p-2.5 sm:p-3 rounded-lg border-2 text-sm sm:text-base ${scriptLength === len ? 'bg-blue-600 border-blue-700 text-white' : 'bg-white border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600'}`}
                 >
-                  {len} Minutes
+                    {/* *** FIX: Split number and text for better alignment *** */}
+                  <span className="font-bold mr-1.5">{len}</span>
+                  <span>Minutes</span>
                 </button>
               ))}
             </div>
             <button
               onClick={() => setScriptLength('custom')}
-                // *** MODIFIED: Reduced padding and text size for mobile ***
               className={`w-full p-2.5 sm:p-3 rounded-lg border-2 text-sm sm:text-base ${scriptLength === 'custom' ? 'bg-blue-600 border-blue-700 text-white' : 'bg-white border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600'}`}
             >
               Custom
@@ -918,14 +1010,12 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
                 value={customScriptLength}
                 onChange={(e) => setCustomScriptLength(e.target.value)}
                 placeholder="Enter minutes"
-                // *** MODIFIED: Reduced padding and text size for mobile ***
                 className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm sm:text-base"
               />
             )}
             <button
               onClick={handleGenerateScript}
               disabled={isLoading || (scriptLength === 'custom' && !customScriptLength)}
-                // *** MODIFIED: Reduced padding and text size for mobile ***
               className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
             >
               <Film className="w-5 h-5 mr-2" />
@@ -942,35 +1032,29 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
         
       case 'script_review':
         return (
-          // *** MODIFIED: Reduced padding from p-4 to p-3 ***
-          <div className="space-y-4 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
-            {/* *** MODIFIED: Reduced text size from text-xl to text-lg sm:text-xl *** */}
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">4. Review Your Script</h2>
-            {/* *** MODIFIED: Reduced text size to text-sm sm:text-base *** */}
+          // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
+          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">4. Review Your Script</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Check the script and make any edits you need.</p>
             <textarea
               value={generatedScript}
               onChange={(e) => setGeneratedScript(e.target.value)}
-              // *** MODIFIED: Reduced rows for mobile ***
               rows={10}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:rows-12"
             />
-            {/* *** MODIFIED: Reduced text size *** */}
             <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100">Next Step: AI Voice</h3>
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => handleGenerateVoice('men')}
                 disabled={isLoading}
-                // *** MODIFIED: Reduced padding and text size for mobile ***
-                className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
-            >
-              <Search className="w-5 h-5 mr-2" />
-              Research Topic
+                className="flex-1 bg-cyan-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-cyan-700 disabled:bg-gray-400 flex items-center justify-center"
+              >
+                <Mic className="w-5 h-5 mr-2" />
+                Generate (Men's Voice)
               </button>
               <button
                 onClick={() => handleGenerateVoice('women')}
                 disabled={isLoading}
-                // *** MODIFIED: Reduced padding and text size for mobile ***
                 className="flex-1 bg-pink-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-pink-700 disabled:bg-gray-400 flex items-center justify-center"
               >
                 <Mic className="w-5 h-5 mr-2" />
@@ -994,7 +1078,6 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
          )}
             <button
               onClick={handleSkipToMetadata}
-                // *** MODIFIED: Reduced padding and text size for mobile ***
               className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400"
             >
               {audioUrl ? 'Next: Generate Metadata' : 'Skip & Generate Metadata'}
@@ -1010,20 +1093,17 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
         
       case 'metadata_review':
         return (
-          // *** MODIFIED: Reduced padding from p-4 to p-3 ***
-          <div className="space-y-4 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
-            {/* *** MODIFIED: Reduced text size from text-xl to text-lg sm:text-xl *** */}
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">5. Viral Metadata</h2>
-            {/* *** MODIFIED: Reduced text size to text-sm sm:text-base *** */}
+          // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
+          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">5. Viral Metadata</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Here's your title, description, and hashtags. Copy them easily!</p>
             <CopyableOutput title="Viral YouTube Title" content={generatedTitle} rows={2} />
             <CopyableOutput title="Viral Description" content={generatedDescription} rows={6} />
             <CopyableOutput title="10M+ Viral Hashtags" content={generatedHashtags} rows={3} />
             <button
-                onClick={handleGenerateThumbnail}
-                disabled={isLoading}
-                // *** MODIFIED: Reduced padding and text size for mobile ***
-                className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
+              onClick={handleGenerateThumbnail}
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
             >
               <ImageIcon className="w-5 h-5 mr-2" />
               Generate Thumbnail
@@ -1039,23 +1119,20 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
         
       case 'thumbnail':
         return (
-          // *** MODIFIED: Reduced padding from p-4 to p-3 ***
-          <div className="space-y-4 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
-            {/* *** MODIFIED: Reduced text size from text-xl to text-lg sm:text-xl *** */}
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">6. Your Thumbnail</h2>
-            {/* *** MODIFIED: Reduced text size to text-sm sm:text-base *** */}
+          // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
+          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">6. Your Thumbnail</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Generated at 1280x720 (YouTube's standard 16:9 ratio).</p>
             {thumbnailUrl && (
               // This container is perfect for responsiveness, no changes needed
               <div className="w-full aspect-[16/9] rounded-lg shadow-lg overflow-hidden border border-gray-300 dark:border-gray-600">
                 <img src={thumbnailUrl} alt="Generated Thumbnail" className="w-full h-full object-cover" />
-    t     </div>
+              </div>
             )}
             <button
               onClick={handleGenerateThumbnail}
-                disabled={isLoading}
-                // *** MODIFIED: Reduced padding and text size for mobile ***
-                className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
             >
               <ImageIcon className="w-5 h-5 mr-2" />
               Generate Another One
@@ -1064,7 +1141,6 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
             <a
               href={thumbnailUrl}
               download="generated_thumbnail.png"
-              // *** MODIFIED: Reduced padding and text size for mobile ***
               className={`w-full bg-green-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-green-700 flex items-center justify-center ${!thumbnailUrl ? 'opacity-50 pointer-events-none' : ''}`}
             >
               <Download className="w-5 h-5 mr-2" />
@@ -1072,7 +1148,6 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
             </a>
             <button
               onClick={handleSaveProject} // NEW: Changed to save project
-                // *** MODIFIED: Reduced padding and text size for mobile ***
               className="w-full bg-purple-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-purple-700"
             >
               <Save className="w-5 h-5 mr-2" />
@@ -1139,8 +1214,8 @@ const BottomNavBar = ({ activeTab, setActiveTab }) => {
 };
 
 // FIX: renderView moved outside of App to be accessible globally (or passed down)
-
-const renderView = (activeTab, projects, setProjects) => {
+// *** FIX: Added mainRef to signature ***
+const renderView = (activeTab, projects, setProjects, mainRef) => {
     switch (activeTab) {
       case 'home':
         return <HomeView key="home" />;
@@ -1152,9 +1227,8 @@ const renderView = (activeTab, projects, setProjects) => {
       case 'updates':
         return <UpdatesView key="updates" />;
       case 'profile':
-        // Add a key here that changes when the tab is re-selected
-        // This ensures the profile animations re-trigger
-        return <ProfileView key={`profile-${Date.now()}`} />;
+        // *** FIX: Pass mainRef to ProfileView ***
+        return <ProfileView key={`profile-${Date.now()}`} mainRef={mainRef} />;
       default:
         return <HomeView key="home" />;
     }
@@ -1187,7 +1261,8 @@ export default function App() {
           Reduced horizontal padding from p-4 to p-3, with sm:p-4 for larger screens
         */}
         <main ref={mainRef} className="flex-1 overflow-y-auto p-3 sm:p-4 pt-safe pb-20">
-          {renderView(activeTab, projects, setProjects)}
+          {/* *** FIX: Pass mainRef to renderView *** */}
+          {renderView(activeTab, projects, setProjects, mainRef)}
         </main>
         <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
