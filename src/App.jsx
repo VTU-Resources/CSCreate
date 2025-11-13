@@ -307,7 +307,7 @@ const HomeView = () => (
     <div className="text-center pt-4">
       {/* Added responsive text sizes */}
       <h1 className="text-4xl sm:text-5xl font-bold text-blue-600 dark:text-blue-400">CSCreate</h1>
-      <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mt-2">Your AI-Powered YouTube Automation Bot</p>
+      <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mt-2">Kandamas AI-Powered Robot</p>
     </div>
     
     {/* Added responsive padding and overflow-hidden */}
@@ -582,11 +582,11 @@ const ProfileView = ({ mainRef }) => {
       
       {/* Added break-words for all text */}
       <div className="space-y-4 text-gray-700 dark:text-gray-300 break-words">
-        <p className="font-semibold">Last updated: 2025-11-12</p>
+        <p className="font-semibold">Last updated: 24 June 2005</p>
         <p>Your privacy is important to us. This policy explains how CSCreate handles your information.</p>
         
         <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 pt-2">Data Collection & Storage</h2>
-        <p>CSCreate is designed to be privacy-first. All project data you create, including topics, scripts, and metadata, is stored exclusively on your device's **Local Storage**. This data never leaves your device and is not sent to any external server or database.</p>
+        <p>CSCreate is designed to be privacy-first. All project data you create, including topics, scripts, and metadata, is stored exclusively on your device's Local Storage. This data never leaves your device and is not sent to any external server or database.</p>
         
         <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 pt-2">API Services</h2>
         <p>To generate content, the app sends your prompts (like topics or script requirements) to third-party AI models (Google Gemini and Imagen). This interaction is anonymous and no personal data is sent with these requests.</p>
@@ -622,6 +622,8 @@ const ProfileView = ({ mainRef }) => {
         <div className="p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 mb-4 overflow-hidden">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 text-center">Stats</h2>
           <div className="space-y-4">
+            <SkillBar skill="Respectful" targetPercentage={1000} start={startAnimation} />
+            <SkillBar skill="Character" targetPercentage={1000} start={startAnimation} />
             <SkillBar skill="Talented" targetPercentage={1000} start={startAnimation} />
             <SkillBar skill="Intelligent" targetPercentage={1000} start={startAnimation} />
             <SkillBar skill="Clever" targetPercentage={1000} start={startAnimation} />
@@ -631,10 +633,10 @@ const ProfileView = ({ mainRef }) => {
 
         {/* Badges Section */}
         <div className="p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 mb-4 overflow-hidden">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 text-center">Badges</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 text-center">Forever Badges</h2>
           <div className="grid grid-cols-2 gap-4">
-            <Badge icon={Star} label="Genius Badge" />
-            <Badge icon={Award} label="Forever Badge" />
+            <Badge icon={Star} label="Respectful Badge" />
+            <Badge icon={Award} label="Multi-Billionaire Badge" />
           </div>
         </div>
         
