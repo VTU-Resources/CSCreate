@@ -389,15 +389,15 @@ const UpdatesView = () => {
     },
     { 
       icon: BookOpen,
-      thought: "Every day is a new page. Write a good story. Don't let others hold the pen." 
+      thought: "Every day is a new page. Write a Best. Don't let others hold the pen But we hold the both will hold pen forever." 
     },
     { 
       icon: Sparkles,
-      thought: "Success is not final, failure is not fatal: it is the courage to continue that counts." 
+      thought: "Success is not final, failure is not End: it is the courage to continue that listening everyday proud,blessed lines by papu devate kandama." 
     },
     { 
       icon: User,
-      thought: "Believe in yourself, even when no one else does. Your self-worth is not for public vote." 
+      thought: "Nin Preethi-Motivation-Inspiration enda ne yalla sadya forever Papu devate kandama" 
     }
   ];
 
@@ -624,7 +624,6 @@ const ProfileView = ({ mainRef }) => {
           <div className="space-y-4">
             <SkillBar skill="Respectful" targetPercentage={1000} start={startAnimation} />
             <SkillBar skill="Character" targetPercentage={1000} start={startAnimation} />
-            <SkillBar skill="Talented" targetPercentage={1000} start={startAnimation} />
             <SkillBar skill="Intelligent" targetPercentage={1000} start={startAnimation} />
             <SkillBar skill="Clever" targetPercentage={1000} start={startAnimation} />
             <SkillBar skill="Genius" targetPercentage={1000} start={startAnimation} />
