@@ -1,0 +1,52 @@
+{
+  "name": "cscreate-youtube-automator",
+  "version": "1.0.0",
+  "description": "YouTube Asset Automation Bot using Generative AI, built with React, Tailwind CSS, and Capacitor.",
+  "main": "index.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "cross-env DISABLE_ESLINT_PLUGIN=true node node_modules/react-scripts/bin/react-scripts.js build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "capacitor": "npx cap",
+    "cap:sync": "npm run build && npx cap sync",
+    "cap:open:android": "npx cap open android",
+    "cap:add:android": "npx cap add android"
+  },
+  "keywords": [
+    "react",
+    "capacitor",
+    "ai",
+    "youtube",
+    "tailwind"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/cli": "5.7.4",
+    "@capacitor/core": "5.7.4",
+    "lucide-react": "^0.309.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.17",
+    "cross-env": "^7.0.3",
+    "postcss": "^8.4.33",
+    "react-scripts": "5.0.1",
+    "tailwindcss": "^3.4.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "appId": "com.cscreate.youtubeautomator",
+  "appName": "CSCreate Automator",
+  "webDir": "build",
+  "bundledWebRuntime": false,
+  "server": {
+    "allowNavigation": []
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#488AC7",
+      "sound": "beep.wav"
+    },
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
+}
