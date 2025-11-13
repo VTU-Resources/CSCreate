@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 
 // --- API Configuration ---
+// Kept your original API key
 const API_KEY = "AIzaSyAC5fhP8h3-yTk7JmJJaL9q2keQ7gZSMqQ";
 
 // --- API URLs ---
@@ -83,13 +84,16 @@ async function fetchWithBackoff(url, options, maxRetries = 5) {
         return await response.json();
       }
       if (response.status === 429 || response.status >= 500) {
-        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+        // Implement exponential backoff with jitter
+        const jitter = Math.random() * 1000;
+        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i) + jitter));
       } else {
         throw new Error(`API request failed with status ${response.status}: ${await response.text()}`);
       }
     } catch (error) {
       if (i === maxRetries - 1) throw error;
-      await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+      const jitter = Math.random() * 1000;
+      await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i) + jitter));
     }
   }
   throw new Error("API request failed after maximum retries.");
@@ -235,9 +239,9 @@ function cleanApiResponse(text) {
 
 // --- Helper Components ---
 const LoadingSpinner = ({ message }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50">
-    <Loader2 className="w-16 h-16 text-white animate-spin" />
-    <span className="text-white text-lg mt-4">{message}</span>
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50 p-4">
+    <Loader2 className="w-12 h-12 sm:w-16 sm:h-16 text-white animate-spin" />
+    <span className="text-white text-base sm:text-lg mt-4 text-center">{message}</span>
   </div>
 );
 const MessageBox = ({ message, type = 'error' }) => {
@@ -245,12 +249,13 @@ const MessageBox = ({ message, type = 'error' }) => {
   const isError = type === 'error';
   // Note: Added dark mode classes
   return (
-    <div className={`p-4 rounded-lg ${isError ? 'bg-red-100 border-red-400 text-red-700 dark:bg-red-900 dark:border-red-700 dark:text-red-200' : 'bg-blue-100 border-blue-400 text-blue-700 dark:bg-blue-900 dark:border-blue-700 dark:text-blue-200'}`} role="alert">
+    <div className={`p-3 sm:p-4 rounded-lg ${isError ? 'bg-red-100 border-red-400 text-red-700 dark:bg-red-900 dark:border-red-700 dark:text-red-200' : 'bg-blue-100 border-blue-400 text-blue-700 dark:bg-blue-900 dark:border-blue-700 dark:text-blue-200'}`} role="alert">
       <div className="flex items-center">
-        {isError ? <AlertCircle className="w-5 h-5 mr-2" /> : <CheckCircle className="w-5 h-5 mr-2" />}
+        {isError ? <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" /> : <CheckCircle className="w-5 h-5 mr-2 flex-shrink-0" />}
         <span className="font-medium">{isError ? 'Error:' : 'Info:'}</span>
       </div>
-      <p className="ml-7">{message}</p>
+      {/* Added break-words to prevent long error messages from overflowing */}
+      <p className="ml-7 break-words">{message}</p>
     </div>
   );
 };
@@ -272,12 +277,12 @@ const CopyableOutput = ({ title, content, rows = 3 }) => {
   };
   // Note: Added dark mode classes
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 space-y-2 border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+    <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 space-y-2 border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{title}</h3>
+        <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 break-words">{title}</h3>
         <button
           onClick={handleCopy}
-          className={`px-3 py-1 text-sm font-medium rounded-md flex items-center ${copied ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}`}
+          className={`px-3 py-1 text-sm font-medium rounded-md flex items-center flex-shrink-0 ml-2 ${copied ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}`}
         >
           {copied ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
           {copied ? 'Copied!' : 'Copy'}
@@ -296,26 +301,30 @@ const CopyableOutput = ({ title, content, rows = 3 }) => {
 // --- Page View Components ---
 
 const HomeView = () => (
-  <div className="p-4 space-y-6">
+  // Added responsive padding
+  <div className="p-1 sm:p-4 space-y-6">
     <div className="text-center pt-4">
-      <h1 className="text-5xl font-bold text-blue-600 dark:text-blue-400">CSCreate</h1>
-      <p className="text-xl text-gray-600 dark:text-gray-300 mt-2">Your AI-Powered YouTube Automation Bot</p>
+      {/* Added responsive text sizes */}
+      <h1 className="text-4xl sm:text-5xl font-bold text-blue-600 dark:text-blue-400">CSCreate</h1>
+      <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mt-2">Your AI-Powered YouTube Automation Bot</p>
     </div>
     
-    <div className="p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-3">About CSCreate</h2>
-      <p className="text-gray-700 dark:text-gray-300 mb-2">
+    {/* Added responsive padding and overflow-hidden */}
+    <div className="p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 mb-3">About CSCreate</h2>
+      {/* Added break-words for safety */}
+      <p className="text-gray-700 dark:text-gray-300 mb-2 break-words">
         CSCreate is a professional tool developed by <span className="font-semibold">Shridhar Group of Company</span>, 
         designed exclusively for <span className="font-semibold">Kandamas</span> to revolutionize content creation.
       </p>
-      <p className="text-gray-700 dark:text-gray-300">
+      <p className="text-gray-700 dark:text-gray-300 break-words">
         Our mission is to empower creators by automating the most time-consuming parts of video production, 
         from viral topic research to final script and thumbnail generation, all powered by cutting-edge AI.
       </p>
     </div>
 
-    <div className="p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-      <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Our Services</h3>
+    <div className="p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+      <h3 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Our Services</h3>
       <ul className="list-disc list-inside space-y-3 text-gray-700 dark:text-gray-300">
         <li className="font-medium">App Development & Play Store Publishing</li>
         <li className="font-medium">Website Development & Hosting</li>
@@ -323,7 +332,7 @@ const HomeView = () => (
         <li className="font-medium">Logo Design & Visiting Cards</li>
         <li className="font-medium">And Many more professional services</li>
       </ul>
-      <div className="mt-5 border-t border-gray-200 dark:border-gray-700 pt-4">
+      <div className="mt-5 border-t border-gray-200 dark:border-gray-700 pt-4 break-words">
         <p className="text-gray-700 dark:text-gray-300 font-semibold">Email: <span className="font-normal">shridhargroupofcompany2024@gmail.com</span></p>
         <p className="text-gray-700 dark:text-gray-300 font-semibold">Phone: <span className="font-normal">+91 74836 40694</span></p>
       </div>
@@ -347,17 +356,20 @@ const ProjectsView = ({ projects, setProjects }) => {
   const sortedProjects = [...projects].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   return (
-    <div className="p-4">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Projects</h1>
+    // p-4 was fine, kept it
+    <div className="p-1 sm:p-4">
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">My Projects</h1>
       {isLoading && <p className="mt-2 text-gray-600 dark:text-gray-300">Loading projects...</p>}
       {!isLoading && projects.length === 0 && (
         <p className="mt-4 text-gray-600 dark:text-gray-300">You have no saved projects. Create one and save it!</p>
       )}
       <div className="space-y-4 mt-6">
         {sortedProjects.map(project => (
-          <div key={project.id} className="p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-            <h2 className="text-xl font-bold text-blue-600 dark:text-blue-400">{project.title || "Untitled Project"}</h2>
-            <p className="text-md text-gray-700 dark:text-gray-300 mt-1 font-medium">{project.topic}</p>
+          // Reduced padding, added overflow-hidden
+          <div key={project.id} className="p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+            {/* Added break-words to prevent long titles from overflowing */}
+            <h2 className="text-lg sm:text-xl font-bold text-blue-600 dark:text-blue-400 break-words">{project.title || "Untitled Project"}</h2>
+            <p className="text-base text-gray-700 dark:text-gray-300 mt-1 font-medium break-words">{project.topic}</p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
               Saved on: {new Date(project.createdAt).toLocaleDateString()}
             </p>
@@ -389,14 +401,15 @@ const UpdatesView = () => {
   ];
 
   return (
-    <div className="p-4">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Updates & Motivation</h1>
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Thoughts by Papu Devate Kandama</h2>
+    <div className="p-1 sm:p-4">
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6">Updates & Motivation</h1>
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Thoughts by Papu Devate Kandama</h2>
       <div className="space-y-5">
         {thoughts.map((item, index) => (
-          <div key={index} className="flex items-start p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-            <item.icon className="w-12 h-12 text-blue-500 dark:text-blue-400 mr-5 flex-shrink-0" />
-            <p className="text-lg text-gray-700 dark:text-gray-300 italic">"{item.thought}"</p>
+          // Reduced padding, icon size, and margin for mobile
+          <div key={index} className="flex items-start p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+            <item.icon className="w-10 h-10 sm:w-12 sm:h-12 text-blue-500 dark:text-blue-400 mr-4 flex-shrink-0" />
+            <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 italic">"{item.thought}"</p>
           </div>
         ))}
       </div>
@@ -455,21 +468,22 @@ const ProfileView = () => {
       };
     }, [targetPercentage, start]); // Reruns if start becomes true
 
+    // Responsive bar height
     const barWidth = displayedPercentage / (targetPercentage / 100);
 
     return (
       <div className="w-full">
         <div className="flex justify-between mb-1 items-center">
-          <span className="text-base font-bold text-blue-700 dark:text-blue-400">{skill}</span>
+          <span className="text-sm sm:text-base font-bold text-blue-700 dark:text-blue-400">{skill}</span>
           {isMaxed ? (
-            <span className="text-lg font-bold text-red-600 dark:text-red-500 animate-pulse">MAX</span>
+            <span className="text-base sm:text-lg font-bold text-red-600 dark:text-red-500 animate-pulse">MAX</span>
           ) : (
-            <span className="text-sm font-semibold text-blue-700 dark:text-blue-400">{displayedPercentage}%</span>
+            <span className="text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-400">{displayedPercentage}%</span>
           )}
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-5 dark:bg-gray-700 overflow-hidden shadow-inner">
+        <div className="w-full bg-gray-200 rounded-full h-4 sm:h-5 dark:bg-gray-700 overflow-hidden shadow-inner">
           <div 
-            className="bg-gradient-to-r from-blue-500 to-purple-600 h-5 rounded-full transition-all duration-100 ease-linear" 
+            className="bg-gradient-to-r from-blue-500 to-purple-600 h-4 sm:h-5 rounded-full transition-all duration-100 ease-linear" 
             style={{ width: `${barWidth}%` }}
           ></div>
         </div>
@@ -479,11 +493,12 @@ const ProfileView = () => {
 
   // --- Badge Component ---
   const Badge = ({ icon: Icon, label }) => (
-    <div className="flex flex-col items-center p-4 bg-gray-100 dark:bg-gray-900 rounded-lg shadow-inner">
-      <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full text-white shadow-lg">
-        <Icon className="w-8 h-8" />
+    // Reduced padding, icon size, and text size
+    <div className="flex flex-col items-center p-3 bg-gray-100 dark:bg-gray-900 rounded-lg shadow-inner">
+      <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full text-white shadow-lg">
+        <Icon className="w-6 h-6 sm:w-8 sm:h-8" />
       </div>
-      <span className="mt-3 text-md font-bold text-gray-800 dark:text-gray-200">{label}</span>
+      <span className="mt-2 text-sm text-center font-bold text-gray-800 dark:text-gray-200">{label}</span>
     </div>
   );
   
@@ -491,36 +506,39 @@ const ProfileView = () => {
   const ProfileButton = ({ icon: Icon, label, onClick }) => (
     <button 
       onClick={onClick}
-      className="w-full flex justify-between items-center text-left p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+      // Reduced padding and text size
+      className="w-full flex justify-between items-center text-left p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors overflow-hidden"
     >
       <div className="flex items-center">
-        <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-4" />
-        <span className="text-gray-700 dark:text-gray-300 font-bold text-lg">{label}</span>
+        <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 mr-4 flex-shrink-0" />
+        <span className="text-gray-700 dark:text-gray-300 font-bold text-base sm:text-lg">{label}</span>
       </div>
-      <ChevronRight className="w-5 h-5 text-gray-400" />
+      <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
     </button>
   );
 
   // --- Sub-Page Views ---
   const SettingsPage = () => (
-    <div className="p-4">
-      <button onClick={() => setProfileView('main')} className="flex items-center text-blue-600 dark:text-blue-400 font-semibold mb-6 text-lg">
-        <ChevronLeft className="w-6 h-6 mr-1" /> Back to Profile
+    <div className="p-1 sm:p-4">
+      {/* Reduced text size and margin */}
+      <button onClick={() => setProfileView('main')} className="flex items-center text-blue-600 dark:text-blue-400 font-semibold mb-4 text-base">
+        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 mr-1" /> Back to Profile
       </button>
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Settings</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6">Settings</h1>
       
       <div className="space-y-4">
         <ProfileButton icon={Languages} label="Language" onClick={() => {}} />
         <ProfileButton icon={Database} label="Manage Storage" onClick={() => {}} />
         <ProfileButton icon={Trash2} label="Clear Cache" onClick={() => {}} />
 
-        <div className="p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        {/* Reduced padding and text size */}
+        <div className="p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
            <div className="flex justify-between items-center">
              <div className="flex items-center">
-               <Bell className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-4" />
-               <span className="text-gray-700 dark:text-gray-300 font-bold text-lg">Notifications</span>
+               <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 mr-4" />
+               <span className="text-gray-700 dark:text-gray-300 font-bold text-base sm:text-lg">Notifications</span>
              </div>
-             <div className="relative inline-block w-11 align-middle select-none transition duration-200 ease-in">
+             <div className="relative inline-block w-11 align-middle select-none transition duration-200 ease-in flex-shrink-0">
                 <input type="checkbox" name="toggle" id="toggle" className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer dark:bg-gray-900"/>
                 <label htmlFor="toggle" className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer dark:bg-gray-600"></label>
              </div>
@@ -535,23 +553,24 @@ const ProfileView = () => {
   );
 
   const PrivacyPolicyPage = () => (
-    <div className="p-4">
-      <button onClick={() => setProfileView('main')} className="flex items-center text-blue-600 dark:text-blue-400 font-semibold mb-6 text-lg">
-        <ChevronLeft className="w-6 h-6 mr-1" /> Back to Profile
+    <div className="p-1 sm:p-4">
+      <button onClick={() => setProfileView('main')} className="flex items-center text-blue-600 dark:text-blue-400 font-semibold mb-4 text-base">
+        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 mr-1" /> Back to Profile
       </button>
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Privacy Policy</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6">Privacy Policy</h1>
       
-      <div className="space-y-4 text-gray-700 dark:text-gray-300">
+      {/* Added break-words for all text */}
+      <div className="space-y-4 text-gray-700 dark:text-gray-300 break-words">
         <p className="font-semibold">Last updated: 2025-11-12</p>
         <p>Your privacy is important to us. This policy explains how CSCreate handles your information.</p>
         
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 pt-2">Data Collection & Storage</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 pt-2">Data Collection & Storage</h2>
         <p>CSCreate is designed to be privacy-first. All project data you create, including topics, scripts, and metadata, is stored exclusively on your device's **Local Storage**. This data never leaves your device and is not sent to any external server or database.</p>
         
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 pt-2">API Services</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 pt-2">API Services</h2>
         <p>To generate content, the app sends your prompts (like topics or script requirements) to third-party AI models (Google Gemini and Imagen). This interaction is anonymous and no personal data is sent with these requests.</p>
         
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 pt-2">Contact Us</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 pt-2">Contact Us</h2>
         <p>If you have any questions about this Privacy Policy, please contact <span className="font-semibold">Shridhar Group of Company</span> at <span className="text-blue-500">shridhargroupofcompany2024@gmail.com</span>.</p>
       </div>
     </div>
@@ -568,19 +587,20 @@ const ProfileView = () => {
     }, []);
 
     return (
-      <div className="p-4">
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-28 h-28 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl mb-5">
-            <span className="text-6xl font-bold text-white">CS</span>
+      <div className="p-1 sm:p-4">
+        {/* Made profile header responsive */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl mb-4">
+            <span className="text-5xl sm:text-6xl font-bold text-white">CS</span>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">ChaiShri</h1>
-          <p className="text-2xl text-gray-500 dark:text-gray-400 font-medium">Kandamas</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">ChaiShri</h1>
+          <p className="text-xl sm:text-2xl text-gray-500 dark:text-gray-400 font-medium">Kandamas</p>
         </div>
 
         {/* Stats Section */}
-        <div className="p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 text-center">Stats</h2>
-          <div className="space-y-5">
+        <div className="p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 mb-4 overflow-hidden">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 text-center">Stats</h2>
+          <div className="space-y-4">
             <SkillBar skill="Talented" targetPercentage={1000} start={startAnimation} />
             <SkillBar skill="Intelligent" targetPercentage={1000} start={startAnimation} />
             <SkillBar skill="Clever" targetPercentage={1000} start={startAnimation} />
@@ -589,9 +609,9 @@ const ProfileView = () => {
         </div>
 
         {/* Badges Section */}
-        <div className="p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 text-center">Badges</h2>
-          <div className="grid grid-cols-2 gap-5">
+        <div className="p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 mb-4 overflow-hidden">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 text-center">Badges</h2>
+          <div className="grid grid-cols-2 gap-4">
             <Badge icon={Star} label="Genius Badge" />
             <Badge icon={Award} label="Forever Badge" />
           </div>
@@ -600,16 +620,16 @@ const ProfileView = () => {
         {/* Settings & Links Section */}
         <div className="space-y-4">
           {/* Theme Toggle */}
-          <div className="p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 flex justify-between items-center">
+          <div className="p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 flex justify-between items-center overflow-hidden">
             <div className="flex items-center">
               {theme === 'light' ? 
-                <Sun className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-4" /> : 
-                <Moon className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-4" />}
-              <span className="text-gray-700 dark:text-gray-300 font-bold text-lg">Toggle Theme</span>
+                <Sun className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 mr-4" /> : 
+                <Moon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 mr-4" />}
+              <span className="text-gray-700 dark:text-gray-300 font-bold text-base sm:text-lg">Toggle Theme</span>
             </div>
             <button
               onClick={toggleTheme}
-              className={`relative inline-flex items-center h-7 rounded-full w-12 transition-colors ${theme === 'light' ? 'bg-gray-300' : 'bg-blue-600'}`}
+              className={`relative inline-flex items-center h-7 rounded-full w-12 transition-colors flex-shrink-0 ${theme === 'light' ? 'bg-gray-300' : 'bg-blue-600'}`}
             >
               <span
                 className={`${
@@ -850,8 +870,8 @@ It is forbidden to add any other text besides "EDUSTAR".`;
     switch (step) {
       case 'topic':
         return (
-          // Added dark mode classes
-          <div className="space-y-4 p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          // Reduced padding
+          <div className="space-y-4 p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">1. Start with a Topic</h2>
             <p className="text-gray-600 dark:text-gray-300">Enter a topic to research, or let us suggest what's trending.</p>
             <div className="relative">
@@ -861,13 +881,14 @@ It is forbidden to add any other text besides "EDUSTAR".`;
                 onChange={(e) => setTopicQuery(e.target.value)}
                 placeholder="e.g., 'Today's Education news on VTU'"
                 className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
+a             />
               <Search className="absolute w-5 h-5 text-gray-400 left-3 top-1/2 -translate-y-1/2" />
             </div>
             <button
               onClick={() => handleFetchTopics(false)}
               disabled={isLoading}
               className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
+          
             >
               <Search className="w-5 h-5 mr-2" />
               Research Topic
@@ -885,8 +906,8 @@ It is forbidden to add any other text besides "EDUSTAR".`;
 
       case 'topic_select':
         return (
-          // Added dark mode classes
-          <div className="space-y-4 p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          // Reduced padding
+          <div className="space-y-4 p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">2. Choose Your Topic</h2>
             <p className="text-gray-600 dark:text-gray-300">Select one of these AI-generated video ideas.</p>
             <div className="space-y-3 max-h-96 overflow-y-auto">
@@ -896,18 +917,20 @@ It is forbidden to add any other text besides "EDUSTAR".`;
                 const isResearchResult = typeof topic === 'object' && topic.title && topic.snippet;
                 
                 return (
-                  <div key={index} className="w-full p-4 bg-white border border-gray-200 rounded-lg shadow-sm transition-all dark:bg-gray-700 dark:border-gray-600">
+                  // Reduced padding
+                  <div key={index} className="w-full p-3 bg-white border border-gray-200 rounded-lg shadow-sm transition-all dark:bg-gray-700 dark:border-gray-600">
                     <button
                       onClick={() => handleSelectTopic(topic)}
                       className="w-full text-left"
                     >
                     {isResearchResult ? (
                       <>
-                        <span className="font-bold text-blue-700 dark:text-blue-400">{topic.title}</span>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 italic">"{topic.snippet}"</p>
+                        {/* Added break-words */}
+                        <span className="font-bold text-blue-700 dark:text-blue-400 break-words">{topic.title}</span>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 italic break-words">"{topic.snippet}"</p>
                       </>
                     ) : (
-                      <span className="font-medium dark:text-gray-200">{topic}</span>
+                      <span className="font-medium dark:text-gray-200 break-words">{topic}</span>
                     )}
                     </button>
                     {/* NEW: Added Proof link */}
@@ -938,16 +961,17 @@ It is forbidden to add any other text besides "EDUSTAR".`;
         
       case 'script_length':
         return (
-          // Added dark mode classes
-          <div className="space-y-4 p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          // Reduced padding
+          <div className="space-y-4 p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">3. Set Script Length</h2>
-            <p className="text-gray-600 dark:text-gray-300 font-medium">Topic: <span className="font-normal">{selectedTopic}</span></p>
+            <p className="text-gray-600 dark:text-gray-300 font-medium break-words">Topic: <span className="font-normal">{selectedTopic}</span></p>
             <div className="grid grid-cols-2 gap-3">
               {['5', '10', '15', '20'].map(len => (
                 <button
                   key={len}
                   onClick={() => setScriptLength(len)}
-                  className={`p-4 rounded-lg border-2 ${scriptLength === len ? 'bg-blue-600 border-blue-700 text-white' : 'bg-white border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600'}`}
+                  // Reduced padding
+                  className={`p-3 rounded-lg border-2 ${scriptLength === len ? 'bg-blue-600 border-blue-700 text-white' : 'bg-white border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600'}`}
                 >
                   {len} Minutes
                 </button>
@@ -955,7 +979,7 @@ It is forbidden to add any other text besides "EDUSTAR".`;
             </div>
             <button
               onClick={() => setScriptLength('custom')}
-              className={`w-full p-4 rounded-lg border-2 ${scriptLength === 'custom' ? 'bg-blue-600 border-blue-700 text-white' : 'bg-white border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600'}`}
+              className={`w-full p-3 rounded-lg border-2 ${scriptLength === 'custom' ? 'bg-blue-600 border-blue-700 text-white' : 'bg-white border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600'}`}
             >
               Custom
             </button>
@@ -987,17 +1011,19 @@ It is forbidden to add any other text besides "EDUSTAR".`;
         
       case 'script_review':
         return (
-          // Added dark mode classes
-          <div className="space-y-4 p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          // Reduced padding
+          <div className="space-y-4 p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">4. Review Your Script</h2>
             <p className="text-gray-600 dark:text-gray-300">Check the script and make any edits you need.</p>
             <textarea
               value={generatedScript}
               onChange={(e) => setGeneratedScript(e.target.value)}
-              rows={15}
+              // Reduced rows
+              rows={12}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Next Step: AI Voice</h3>
+            {/* Kept sm:flex-row, which is good for mobile */}
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => handleGenerateVoice('men')}
@@ -1048,8 +1074,8 @@ It is forbidden to add any other text besides "EDUSTAR".`;
         
       case 'metadata_review':
         return (
-          // Added dark mode classes (uses CopyableOutput which has them)
-          <div className="space-y-4 p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          // Reduced padding
+          <div className="space-y-4 p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">5. Viral Metadata</h2>
             <p className="text-gray-600 dark:text-gray-300">Here's your title, description, and hashtags. Copy them easily!</p>
             <CopyableOutput title="Viral YouTube Title" content={generatedTitle} rows={2} />
@@ -1058,7 +1084,7 @@ It is forbidden to add any other text besides "EDUSTAR".`;
             <button
               onClick={handleGenerateThumbnail}
               disabled={isLoading}
-              className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
+      T         className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
             >
               <ImageIcon className="w-5 h-5 mr-2" />
               Generate Thumbnail
@@ -1069,25 +1095,26 @@ It is forbidden to add any other text besides "EDUSTAR".`;
             >
               &larr; Back
             </button>
-          </div>
+    A     </div>
         );
         
       case 'thumbnail':
         return (
-          // Added dark mode classes
-          <div className="space-y-4 p-5 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          // Reduced padding
+          <div className="space-y-4 p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">6. Your Thumbnail</h2>
             <p className="text-gray-600 dark:text-gray-300">Generated at 1280x720 (YouTube's standard 16:9 ratio).</p>
             {thumbnailUrl && (
+              // This container is perfect for responsiveness, no changes needed
               <div className="w-full aspect-[16/9] rounded-lg shadow-lg overflow-hidden border border-gray-300 dark:border-gray-600">
                 <img src={thumbnailUrl} alt="Generated Thumbnail" className="w-full h-full object-cover" />
-              </div>
+        s   </div>
             )}
             <button
               onClick={handleGenerateThumbnail}
               disabled={isLoading}
               className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
-            >
+A           >
               <ImageIcon className="w-5 h-5 mr-2" />
               Generate Another One
             </button>
@@ -1096,6 +1123,7 @@ It is forbidden to add any other text besides "EDUSTAR".`;
               href={thumbnailUrl}
               download="generated_thumbnail.png"
               className={`w-full bg-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-green-700 flex items-center justify-center ${!thumbnailUrl ? 'opacity-50 pointer-events-none' : ''}`}
+              
             >
               <Download className="w-5 h-5 mr-2" />
               Download Thumbnail
@@ -1122,8 +1150,8 @@ It is forbidden to add any other text besides "EDUSTAR".`;
   };
 
   return (
-    // Added dark mode classes
-    <div className="w-full max-w-2xl mx-auto space-y-4">
+    // Tightened max-width for a better feel on tablets
+    <div className="w-full max-w-xl mx-auto space-y-4">
       {isLoading && <LoadingSpinner message={loadingMessage} />}
       <MessageBox message={errorMessage} type="error" />
       {renderStep()}
@@ -1144,7 +1172,8 @@ const BottomNavBar = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-gray-200 shadow-t-2xl pb-safe z-10 dark:bg-gray-900 dark:border-gray-700">
+    // Reduced height from h-20 to h-16
+    <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-200 shadow-t-2xl pb-safe z-10 dark:bg-gray-900 dark:border-gray-700">
       <div className="max-w-md mx-auto h-full flex justify-around items-center">
         {navItems.map(item => (
           <button
@@ -1153,10 +1182,12 @@ const BottomNavBar = ({ activeTab, setActiveTab }) => {
             data-active={(activeTab === item.id).toString()}
             className="flex flex-col items-center justify-center w-full h-full text-gray-500 data-[active=true]:text-blue-600 dark:text-gray-400 dark:data-[active=true]:text-blue-400 transition-colors group"
           >
-            <div className={`p-3 rounded-full ${activeTab === item.id ? 'bg-blue-100 dark:bg-blue-900' : 'group-hover:bg-gray-100 dark:group-hover:bg-gray-800'}`}>
-              <item.icon className="w-7 h-7" />
+            {/* Reduced icon size from w-7 h-7 to w-6 h-6 */}
+            <div className={`p-2 sm:p-3 rounded-full ${activeTab === item.id ? 'bg-blue-100 dark:bg-blue-900' : 'group-hover:bg-gray-100 dark:group-hover:bg-gray-800'}`}>
+              <item.icon className="w-6 h-6" />
             </div>
-            <span className="text-xs font-bold mt-1">{item.label}</span>
+            {/* Made text smaller */}
+            <span className="text-xs font-bold mt-0.5">{item.label}</span>
           </button>
         ))}
       </div>
@@ -1178,7 +1209,9 @@ const renderView = (activeTab, projects, setProjects) => {
       case 'updates':
         return <UpdatesView key="updates" />;
       case 'profile':
-        return <ProfileView key="profile" />;
+        // Add a key here that changes when the tab is re-selected
+        // This ensures the profile animations re-trigger
+        return <ProfileView key={`profile-${Date.now()}`} />;
       default:
         return <HomeView key="home" />;
     }
@@ -1191,13 +1224,26 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('create');
   // Load projects from local storage
   const [projects, setProjects] = useLocalStorage('cscreate_projects', []);
+  
+  // *** FIX: Ref for scrolling to top ***
+  const mainRef = useRef(null);
+  
+  // *** FIX: Scroll to top when activeTab changes ***
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo(0, 0);
+    }
+  }, [activeTab]);
 
   return (
     <ThemeProvider>
       {/* Using Inter font for a pro look */}
       <div className="flex flex-col h-screen bg-gray-100 font-inter dark:bg-gray-950">
-        {/* Added extra padding-bottom to avoid overlap with new nav bar */}
-        <main className="flex-1 overflow-y-auto p-4 pt-safe pb-24">
+        {/* *** FIX: Added ref and adjusted padding ***
+          Reduced padding-bottom from pb-24 to pb-20 (to match new h-16 nav)
+          Reduced horizontal padding from p-4 to p-3, with sm:p-4 for larger screens
+        */}
+        <main ref={mainRef} className="flex-1 overflow-y-auto p-3 sm:p-4 pt-safe pb-20">
           {renderView(activeTab, projects, setProjects)}
         </main>
         <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -1206,7 +1252,7 @@ export default function App() {
       {/* Added global style for the theme toggle checkbox */}
       <style>{`
         .toggle-checkbox:checked {
-          right: 0;
+          transform: translateX(1.25rem); /* Move the handle for toggle */
           border-color: #3b82f6; /* blue-600 */
         }
         .toggle-checkbox:checked + .toggle-label {
@@ -1217,6 +1263,11 @@ export default function App() {
         }
         .dark .toggle-checkbox:checked + .toggle-label {
           background-color: #60a5fa; /* blue-400 */
+        }
+        /* Basic styles for the toggle switch */
+        .toggle-checkbox {
+          transition: all 0.2s ease-in-out;
+          left: 0;
         }
       `}</style>
     </ThemeProvider>
