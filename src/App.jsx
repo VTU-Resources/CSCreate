@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
-import { 
-  Home, Briefcase, PenSquare, Bell, User, Copy, Download, Loader2, 
-  AlertCircle, CheckCircle, Search, Sparkles, Mic, Film, Image as ImageIcon, 
+import {
+  Home, Briefcase, PenSquare, Bell, User, Copy, Download, Loader2,
+  AlertCircle, CheckCircle, Search, Sparkles, Mic, Film, Image as ImageIcon,
   Check, Save, Moon, Sun, Settings, Shield, ChevronRight, BookOpen, Brain,
   Award, Star, ChevronLeft, Trash2, Database, Languages, Link2
 } from 'lucide-react';
@@ -69,12 +69,12 @@ const useTheme = () => useContext(ThemeContext);
 
 // --- Exponential Backoff Fetch ---
 /**
- * A robust fetch wrapper with exponential backoff for API calls.
- * @param {string} url The API endpoint URL.
- * @param {object} options The fetch options (method, headers, body).
- * @param {number} maxRetries Maximum number of retries.
- * @returns {Promise<object>} The JSON response from the API.
- */
+  * A robust fetch wrapper with exponential backoff for API calls.
+  * @param {string} url The API endpoint URL.
+  * @param {object} options The fetch options (method, headers, body).
+  * @param {number} maxRetries Maximum number of retries.
+  * @returns {Promise<object>} The JSON response from the API.
+  */
 async function fetchWithBackoff(url, options, maxRetries = 5) {
   let delay = 1000;
   for (let i = 0; i < maxRetries; i++) {
@@ -101,12 +101,12 @@ async function fetchWithBackoff(url, options, maxRetries = 5) {
 
 // --- API Call Functions ---
 /**
- * Calls the Gemini API for text generation (with optional grounding).
- * @param {string} userQuery The user's prompt.
- * @param {string} systemPrompt The system instruction.
- * @param {boolean} useGrounding Whether to enable Google Search grounding.
- * @returns {Promise<string>} The generated text.
- */
+  * Calls the Gemini API for text generation (with optional grounding).
+  * @param {string} userQuery The user's prompt.
+  * @param {string} systemPrompt The system instruction.
+  * @param {boolean} useGrounding Whether to enable Google Search grounding.
+  * @returns {Promise<string>} The generated text.
+  */
 async function callGeminiApi(userQuery, systemPrompt, useGrounding = false) {
   const payload = {
     contents: [{ parts: [{ text: userQuery }] }],
@@ -127,10 +127,10 @@ async function callGeminiApi(userQuery, systemPrompt, useGrounding = false) {
   return text;
 }
 /**
- * Calls the Imagen API to generate an image.
- * @param {string} prompt The prompt for image generation.
- * @returns {Promise<string>} The base64 encoded image data.
- */
+  * Calls the Imagen API to generate an image.
+  * @param {string} prompt The prompt for image generation.
+  * @returns {Promise<string>} The base64 encoded image data.
+  */
 async function callImagenApi(prompt) {
   const payload = {
     instances: [{ prompt }],
@@ -148,11 +148,11 @@ async function callImagenApi(prompt) {
   return base64Data;
 }
 /**
- * Calls the TTS API to generate audio.
- * @param {string} text The script to synthesize.
- * @param {string} voiceName The prebuilt voice name (e.g., 'Kore', 'Puck').
- * @returns {Promise<string>} The base64 encoded PCM audio data.
- */
+  * Calls the TTS API to generate audio.
+  * @param {string} text The script to synthesize.
+  * @param {string} voiceName The prebuilt voice name (e.g., 'Kore', 'Puck').
+  * @returns {Promise<string>} The base64 encoded PCM audio data.
+  */
 async function callTtsApi(text, voiceName) {
   const payload = {
     contents: [{ parts: [{ text }] }],
@@ -545,12 +545,12 @@ const ProfileView = ({ mainRef }) => {
 
           {/* Reduced padding and text size */}
           <div className="p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
-             <div className="flex justify-between items-center">
-               <div className="flex items-center">
-                 <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 mr-4" />
-                 <span className="text-gray-700 dark:text-gray-300 font-bold text-base sm:text-lg">Notifications</span>
-               </div>
-               <div className="relative inline-block w-11 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center">
+                  <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 mr-4" />
+                  <span className="text-gray-700 dark:text-gray-300 font-bold text-base sm:text-lg">Notifications</span>
+                </div>
+                <div className="relative inline-block w-11 align-middle select-none transition duration-200 ease-in flex-shrink-0">
                   {/* *** FIX: Made this a controlled component *** */}
                   <input 
                     type="checkbox" 
@@ -561,8 +561,8 @@ const ProfileView = ({ mainRef }) => {
                     onChange={() => setNotifications(prev => !prev)}
                   />
                   <label htmlFor="toggle" className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer dark:bg-gray-600"></label>
-               </div>
-             </div>
+                </div>
+              </div>
           </div>
           
           <div className="text-center text-gray-500 dark:text-gray-400 text-sm pt-8">
@@ -641,7 +641,15 @@ const ProfileView = ({ mainRef }) => {
         
         {/* Settings & Links Section */}
         <div className="space-y-4">
-          {/* Theme Toggle */}
+          
+          {/*
+          // ===============================================
+          //          *** CODE MODIFICATION HERE ***
+          // Replaced the old <button> toggle with the new
+          // <input> and <label> toggle to match the style
+          // from the Settings page and your screenshot.
+          // ===============================================
+          */}
           <div className="p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 flex justify-between items-center overflow-hidden">
             <div className="flex items-center">
               {theme === 'light' ? 
@@ -649,17 +657,22 @@ const ProfileView = ({ mainRef }) => {
                 <Moon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 mr-4" />}
               <span className="text-gray-700 dark:text-gray-300 font-bold text-base sm:text-lg">Toggle Theme</span>
             </div>
-            <button
-              onClick={toggleTheme}
-              className={`relative inline-flex items-center h-7 rounded-full w-12 transition-colors flex-shrink-0 ${theme === 'light' ? 'bg-gray-300' : 'bg-blue-600'}`}
-            >
-              <span
-                className={`${
-                  theme === 'dark' ? 'translate-x-6' : 'translate-x-1'
-                } inline-block w-5 h-5 transform bg-white rounded-full transition-transform`}
+            <div className="relative inline-block w-11 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+              <input
+                type="checkbox"
+                name="theme-toggle"
+                id="theme-toggle"
+                className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer dark:bg-gray-900"
+                checked={theme === 'dark'}
+                onChange={toggleTheme}
               />
-            </button>
+              <label htmlFor="theme-toggle" className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer dark:bg-gray-600"></label>
+            </div>
           </div>
+          {/* ===============================================
+          //        *** END OF CODE MODIFICATION ***
+          // ===============================================
+          */}
 
           {/* Settings Button */}
           <ProfileButton icon={Settings} label="Settings" onClick={() => setProfileView('settings')} />
@@ -687,177 +700,177 @@ const ProfileView = ({ mainRef }) => {
 // --- Main Workflow Component ---
 // UPDATED based on your requests
 const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
-  const [step, setStep] = useState('topic'); // topic, topic_select, script_length, script_review, voice_choice, metadata_review, thumbnail
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState('Working on it...');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [step, setStep] = useState('topic'); // topic, topic_select, script_length, script_review, voice_choice, metadata_review, thumbnail
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('Working on it...');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  // Workflow State
-  const [topicQuery, setTopicQuery] = useState('');
-  const [suggestedTopics, setSuggestedTopics] = useState([]);
-  const [selectedTopic, setSelectedTopic] = useState('');
-  const [scriptLength, setScriptLength] = useState('5');
-  const [customScriptLength, setCustomScriptLength] = useState('');
-  const [generatedScript, setGeneratedScript] = useState('');
-  const [audioUrl, setAudioUrl] = useState('');
-  const [generatedTitle, setGeneratedTitle] = useState('');
-  const [generatedDescription, setGeneratedDescription] = useState('');
-  const [generatedHashtags, setGeneratedHashtags] = useState('');
-  const [thumbnailUrl, setThumbnailUrl] = useState('');
-  
-  const metadataFetchedRef = useRef(false);
+  // Workflow State
+  const [topicQuery, setTopicQuery] = useState('');
+  const [suggestedTopics, setSuggestedTopics] = useState([]);
+  const [selectedTopic, setSelectedTopic] = useState('');
+  const [scriptLength, setScriptLength] = useState('5');
+  const [customScriptLength, setCustomScriptLength] = useState('');
+  const [generatedScript, setGeneratedScript] = useState('');
+  const [audioUrl, setAudioUrl] = useState('');
+  const [generatedTitle, setGeneratedTitle] = useState('');
+  const [generatedDescription, setGeneratedDescription] = useState('');
+  const [generatedHashtags, setGeneratedHashtags] = useState('');
+  const [thumbnailUrl, setThumbnailUrl] = useState('');
+  
+  const metadataFetchedRef = useRef(false);
 
-  // --- API Handlers ---
+  // --- API Handlers ---
 
-  const handleError = (error, defaultMessage) => {
-    console.error(error);
-    setErrorMessage(error.message || defaultMessage);
-    setIsLoading(false);
-  };
+  const handleError = (error, defaultMessage) => {
+    console.error(error);
+    setErrorMessage(error.message || defaultMessage);
+    setIsLoading(false);
+  };
 
-  const handleFetchTopics = async (isSuggestion) => {
-    if (!topicQuery && !isSuggestion) {
-      setErrorMessage("Please enter a topic to research.");
-      return;
-    }
-    
-    setIsLoading(true);
-    setLoadingMessage(isSuggestion ? 'Generating viral topics...' : 'Deep researching real-time news...');
-    setErrorMessage('');
-    
+  const handleFetchTopics = async (isSuggestion) => {
+    if (!topicQuery && !isSuggestion) {
+      setErrorMessage("Please enter a topic to research.");
+      return;
+    }
+    
+    setIsLoading(true);
+    setLoadingMessage(isSuggestion ? 'Generating viral topics...' : 'Deep researching real-time news...');
+    setErrorMessage('');
+    
     // NEW: Updated prompt for "Research Topic"
-    const systemPrompt = isSuggestion 
-      ? "You are a YouTube viral topic expert. Suggest the top 10 most viral-potential YouTube video topics *right now*. Respond with ONLY a valid JSON array of strings. Do not include any other text."
-      : "You are a real-time news aggregation bot. The user has provided a topic. Perform a deep Google Search of official portals and news sites to find the TOP 10 *most recent* and *verifiable* breaking news articles. Respond with ONLY a valid JSON array of objects. Each object must have three keys: 'title' (the exact news headline), 'snippet' (a short, 1-2 sentence summary), and 'source_url' (the direct URL to the article for proof). Example: [{\"title\": \"...\", \"snippet\": \"...\", \"source_url\": \"...\"}]";
-      
-    const userQuery = isSuggestion 
-      ? "Suggest top 10 viral topics." 
-      : `Research "${topicQuery}" and find 10 real-time news headlines with source URLs.`;
-      
-    try {
-      const text = await callGeminiApi(userQuery, systemPrompt, true); // Use grounding
-      const cleanedText = cleanApiResponse(text); // Clean the response
-      const topics = JSON.parse(cleanedText); // Parse the cleaned text
-      setSuggestedTopics(topics);
-      setStep('topic_select');
-    } catch (error) {
-      handleError(error, "Failed to fetch topics. The API might have returned an invalid format.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const handleSelectTopic = (topic) => {
-    // If topic is an object (from research), use its title.
-    // If it's a string (from suggestions), use it directly.
-    const topicTitle = typeof topic === 'object' && topic.title ? topic.title : topic;
-    setSelectedTopic(topicTitle);
-    setStep('script_length');
-  };
-  
-  const handleGenerateScript = async () => {
-    setIsLoading(true);
-    setLoadingMessage('Generating your script...');
-    setErrorMessage('');
-    
-    const length = scriptLength === 'custom' ? customScriptLength : scriptLength;
-    
-    const systemPrompt = "You are a professional YouTube scriptwriter. You write clean, engaging, and concise scripts. The output must be *only* the script text itself, with no timings, 'intro:', 'outro:', speaker names, or any other metadata. Just the spoken words for the voiceover.";
-    const userQuery = `Write a ${length}-minute YouTube video script about "${selectedTopic}". Start the script *immediately* with the main content. Do not add any intro, greeting, or channel plugs. Just the main script body.`;
-    
-    try {
-      const scriptBody = await callGeminiApi(userQuery, systemPrompt, false);
-      const finalScript = "Welcome Back to Edu Star Youtube channel and If you are first time to our channel Dont forgot to subscribe to our chanel done misss updates and lets start todays video...now today we are talking aboutt... " + scriptBody;
-      setGeneratedScript(finalScript);
-      setStep('script_review');
-    } catch (error) {
-      handleError(error, "Failed to generate script.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const handleGenerateVoice = async (gender) => {
-    setIsLoading(true);
-    setLoadingMessage('Generating AI voice...');
-    setErrorMessage('');
-  
-    // Voices: 'Kore' (firmer, lower), 'Puck' (upbeat, higher)
-    const voiceName = gender === 'men' ? 'Kore' : 'Puck'; 
-    
-    try {
-      const { audioData, sampleRate } = await callTtsApi(generatedScript, voiceName);
-      const pcmBuffer = base64ToArrayBuffer(audioData);
-      const pcm16 = new Int16Array(pcmBuffer);
-      const wavBlob = pcmToWav(pcm16, sampleRate);
-      const url = URL.createObjectURL(wavBlob);
-      setAudioUrl(url);
-    } catch (error) {
-      handleError(error, "Failed to generate audio.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const handleGenerateMetadata = async () => {
-    metadataFetchedRef.current = true; // Mark as fetched
-    setIsLoading(true);
-    setLoadingMessage('Generating viral metadata...');
-    setErrorMessage('');
-    
-    const systemPrompt = "You are a YouTube SEO expert, specialized in creating viral titles, descriptions, and hashtags. Respond *only* with a valid JSON object with keys: 'title' (string), 'description' (string), 'hashtags' (string). The 'hashtags' value should be a single string of 10+ space-separated hashtags (e.g., '#topic #viral #youtube').";
-    const userQuery = `Generate a viral YouTube title, a compelling description, and 10+ high-traffic hashtags for a video about "${selectedTopic}". Use this script summary: "${generatedScript.substring(0, 800)}..."`;
-    
-    try {
-      const text = await callGeminiApi(userQuery, systemPrompt, true); // Use grounding for current trends
-      const cleanedText = cleanApiResponse(text); // Clean the response
-      const data = JSON.parse(cleanedText); // Parse the cleaned text
-      setGeneratedTitle(data.title || '');
-      setGeneratedDescription(data.description || '');
-      setGeneratedHashtags(data.hashtags || '');
-      setStep('metadata_review');
-    } catch (error) {
-      handleError(error, "Failed to generate metadata. The API might have returned an invalid format.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  // Auto-run metadata generation when moving to that step
-  useEffect(() => {
-    if (step === 'metadata_review' && !metadataFetchedRef.current) {
-      handleGenerateMetadata();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step]);
-  
-  const handleSkipToMetadata = () => {
-    setAudioUrl(''); // Clear any previously generated audio
-    setStep('metadata_review');
-  };
-  
-  const handleGenerateThumbnail = async () => {
-    setIsLoading(true);
-    setLoadingMessage('Generating 1280x720 thumbnail...');
-    setErrorMessage('');
-    
+    const systemPrompt = isSuggestion 
+      ? "You are a YouTube viral topic expert. Suggest the top 10 most viral-potential YouTube video topics *right now*. Respond with ONLY a valid JSON array of strings. Do not include any other text."
+      : "You are a real-time news aggregation bot. The user has provided a topic. Perform a deep Google Search of official portals and news sites to find the TOP 10 *most recent* and *verifiable* breaking news articles. Respond with ONLY a valid JSON array of objects. Each object must have three keys: 'title' (the exact news headline), 'snippet' (a short, 1-2 sentence summary), and 'source_url' (the direct URL to the article for proof). Example: [{\"title\": \"...\", \"snippet\": \"...\", \"source_url\": \"...\"}]";
+      
+    const userQuery = isSuggestion 
+      ? "Suggest top 10 viral topics." 
+      : `Research "${topicQuery}" and find 10 real-time news headlines with source URLs.`;
+      
+    try {
+      const text = await callGeminiApi(userQuery, systemPrompt, true); // Use grounding
+      const cleanedText = cleanApiResponse(text); // Clean the response
+      const topics = JSON.parse(cleanedText); // Parse the cleaned text
+      setSuggestedTopics(topics);
+      setStep('topic_select');
+    } catch (error) {
+      handleError(error, "Failed to fetch topics. The API might have returned an invalid format.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleSelectTopic = (topic) => {
+    // If topic is an object (from research), use its title.
+    // If it's a string (from suggestions), use it directly.
+    const topicTitle = typeof topic === 'object' && topic.title ? topic.title : topic;
+    setSelectedTopic(topicTitle);
+    setStep('script_length');
+  };
+  
+  const handleGenerateScript = async () => {
+    setIsLoading(true);
+    setLoadingMessage('Generating your script...');
+    setErrorMessage('');
+    
+    const length = scriptLength === 'custom' ? customScriptLength : scriptLength;
+    
+    const systemPrompt = "You are a professional YouTube scriptwriter. You write clean, engaging, and concise scripts. The output must be *only* the script text itself, with no timings, 'intro:', 'outro:', speaker names, or any other metadata. Just the spoken words for the voiceover.";
+    const userQuery = `Write a ${length}-minute YouTube video script about "${selectedTopic}". Start the script *immediately* with the main content. Do not add any intro, greeting, or channel plugs. Just the main script body.`;
+    
+    try {
+      const scriptBody = await callGeminiApi(userQuery, systemPrompt, false);
+      const finalScript = "Welcome Back to Edu Star Youtube channel and If you are first time to our channel Dont forgot to subscribe to our chanel done misss updates and lets start todays video...now today we are talking aboutt... " + scriptBody;
+      setGeneratedScript(finalScript);
+      setStep('script_review');
+    } catch (error) {
+      handleError(error, "Failed to generate script.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleGenerateVoice = async (gender) => {
+    setIsLoading(true);
+    setLoadingMessage('Generating AI voice...');
+    setErrorMessage('');
+  
+    // Voices: 'Kore' (firmer, lower), 'Puck' (upbeat, higher)
+    const voiceName = gender === 'men' ? 'Kore' : 'Puck'; 
+    
+    try {
+      const { audioData, sampleRate } = await callTtsApi(generatedScript, voiceName);
+      const pcmBuffer = base64ToArrayBuffer(audioData);
+      const pcm16 = new Int16Array(pcmBuffer);
+      const wavBlob = pcmToWav(pcm16, sampleRate);
+      const url = URL.createObjectURL(wavBlob);
+      setAudioUrl(url);
+    } catch (error) {
+      handleError(error, "Failed to generate audio.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleGenerateMetadata = async () => {
+    metadataFetchedRef.current = true; // Mark as fetched
+    setIsLoading(true);
+    setLoadingMessage('Generating viral metadata...');
+    setErrorMessage('');
+    
+    const systemPrompt = "You are a YouTube SEO expert, specialized in creating viral titles, descriptions, and hashtags. Respond *only* with a valid JSON object with keys: 'title' (string), 'description' (string), 'hashtags' (string). The 'hashtags' value should be a single string of 10+ space-separated hashtags (e.g., '#topic #viral #youtube').";
+    const userQuery = `Generate a viral YouTube title, a compelling description, and 10+ high-traffic hashtags for a video about "${selectedTopic}". Use this script summary: "${generatedScript.substring(0, 800)}..."`;
+    
+    try {
+      const text = await callGeminiApi(userQuery, systemPrompt, true); // Use grounding for current trends
+      const cleanedText = cleanApiResponse(text); // Clean the response
+      const data = JSON.parse(cleanedText); // Parse the cleaned text
+      setGeneratedTitle(data.title || '');
+      setGeneratedDescription(data.description || '');
+      setGeneratedHashtags(data.hashtags || '');
+      setStep('metadata_review');
+    } catch (error) {
+      handleError(error, "Failed to generate metadata. The API might have returned an invalid format.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Auto-run metadata generation when moving to that step
+  useEffect(() => {
+    if (step === 'metadata_review' && !metadataFetchedRef.current) {
+      handleGenerateMetadata();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+  
+  const handleSkipToMetadata = () => {
+    setAudioUrl(''); // Clear any previously generated audio
+    setStep('metadata_review');
+  };
+  
+  const handleGenerateThumbnail = async () => {
+    setIsLoading(true);
+    setLoadingMessage('Generating 1280x720 thumbnail...');
+    setErrorMessage('');
+    
     // NEW: Final locked prompt
-    const prompt = `Create a realistic, 4K HD, professional YouTube thumbnail for the selected topic ("${selectedTopic}").
+    const prompt = `Create a realistic, 4K HD, professional YouTube thumbnail for the selected topic ("${selectedTopic}").
 The final dimension must be exactly 1280x720 pixels (16:9 aspect ratio).
 It MUST include the text "EDUSTAR" as a small, clean logo or watermark.
 It must feature compelling, high-quality, realistic, viral-themed imagery related to the topic.
 It is forbidden to add any other text besides "EDUSTAR".`;
-    
-    try {
-      const base64Data = await callImagenApi(prompt);
-      setThumbnailUrl(`data:image/png;base64,${base64Data}`);
-      setStep('thumbnail'); // Move to the final step
-    } catch (error) {
-      handleError(error, "Failed to generate thumbnail.");
-    } finally {
-      setIsLoading(false);
-   }
-  };
+    
+    try {
+      const base64Data = await callImagenApi(prompt);
+      setThumbnailUrl(`data:image/png;base64,${base64Data}`);
+      setStep('thumbnail'); // Move to the final step
+    } catch (error) {
+      handleError(error, "Failed to generate thumbnail.");
+    } finally {
+      setIsLoading(false);
+   }
+  };
 
   // NEW: Save Project Function
   const handleSaveProject = () => {
@@ -888,70 +901,70 @@ It is forbidden to add any other text besides "EDUSTAR".`;
     metadataFetchedRef.current = false;
   };
 
-  const renderStep = () => {
-    switch (step) {
-      case 'topic':
-        return (
+  const renderStep = () => {
+    switch (step) {
+      case 'topic':
+        return (
           // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
-          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">1. Start with a Topic</h2>
+          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">1. Start with a Topic</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Enter a topic to research, or let us suggest what's trending.</p>
-            <div className="relative">
-              <input
-                type="text"
-                value={topicQuery}
-                onChange={(e) => setTopicQuery(e.target.value)}
-                placeholder="e.g., 'Today's Education news on VTU'"
-                className="w-full p-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm sm:text-base"
-              />
-              <Search className="absolute w-5 h-5 text-gray-400 left-3 top-1/2 -translate-y-1/2" />
-            </div>
-            <button
-              onClick={() => handleFetchTopics(false)}
-              disabled={isLoading}
-              className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
-            >
-              <Search className="w-5 h-5 mr-2" />
-              Research Topic
-            </button>
-            <button
-              onClick={() => handleFetchTopics(true)}
-              disabled={isLoading}
-              className="w-full bg-purple-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-purple-700 disabled:bg-gray-400 flex items-center justify-center"
-            >
-              <Sparkles className="w-5 h-5 mr-2" />
-              Suggest Top 10 Viral Topics
-            </button>
-          </div>
-        );
+            <div className="relative">
+              <input
+                type="text"
+                value={topicQuery}
+                onChange={(e) => setTopicQuery(e.target.value)}
+                placeholder="e.g., 'Today's Education news on VTU'"
+                className="w-full p-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm sm:text-base"
+              />
+              <Search className="absolute w-5 h-5 text-gray-400 left-3 top-1/2 -translate-y-1/2" />
+            </div>
+            <button
+              onClick={() => handleFetchTopics(false)}
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
+            >
+              <Search className="w-5 h-5 mr-2" />
+              Research Topic
+            </button>
+            <button
+              onClick={() => handleFetchTopics(true)}
+              disabled={isLoading}
+              className="w-full bg-purple-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-purple-700 disabled:bg-gray-400 flex items-center justify-center"
+            >
+              <Sparkles className="w-5 h-5 mr-2" />
+              Suggest Top 10 Viral Topics
+            </button>
+          </div>
+        );
 
-      case 'topic_select':
-        return (
+      case 'topic_select':
+        return (
           // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
-          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">2. Choose Your Topic</h2>
+          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">2. Choose Your Topic</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Select one of these AI-generated video ideas.</p>
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {suggestedTopics.map((topic, index) => {
-                // Check if topic is an object (from research) or a string (from suggestions)
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {suggestedTopics.map((topic, index) => {
+                // Check if topic is an object (from research) or a string (from suggestions)
                 // NEW: Updated logic to check for source_url
-                const isResearchResult = typeof topic === 'object' && topic.title && topic.snippet;
-                
-                return (
-                  <div key={index} className="w-full p-2.5 sm:p-3 bg-white border border-gray-200 rounded-lg shadow-sm transition-all dark:bg-gray-700 dark:border-gray-600">
-                    <button
-                      onClick={() => handleSelectTopic(topic)}
+                const isResearchResult = typeof topic === 'object' && topic.title && topic.snippet;
+                
+                return (
+                  <div key={index} className="w-full p-2.5 sm:p-3 bg-white border border-gray-200 rounded-lg shadow-sm transition-all dark:bg-gray-700 dark:border-gray-600">
+                    <button
+                      onClick={() => handleSelectTopic(topic)}
                       className="w-full text-left"
                     >
-                    {isResearchResult ? (
-                      <>
-                        <span className="font-bold text-base text-blue-700 dark:text-blue-400 break-words">{topic.title}</span>
+                    {isResearchResult ? (
+                      <>
+                        <span className="font-bold text-base text-blue-700 dark:text-blue-400 break-words">{topic.title}</span>
                         <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1 italic break-words">"{topic.snippet}"</p>
-                      </>
-                    ) : (
-                      <span className="font-medium text-base dark:text-gray-200 break-words">{topic}</span>
-                    )}
-                    </button>
+                      </>
+                    ) : (
+                      <span className="font-medium text-base dark:text-gray-200 break-words">{topic}</span>
+                    )}
+                    </button>
                     {/* NEW: Added Proof link */}
                     {isResearchResult && topic.source_url && (
                       <a
@@ -965,179 +978,179 @@ It is forbidden to add any other text besides "EDUSTAR".`;
                         Proof
                       </a>
                     )}
-                  </div>
-                );
-              })}
-            </div>
-            <button
-              onClick={() => setStep('topic')}
-              className="w-full text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-            >
-              &larr; Back
-            </button>
-          </div>
-        );
-        
-      case 'script_length':
-        return (
+                  </div>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => setStep('topic')}
+              className="w-full text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              &larr; Back
+            </button>
+          </div>
+        );
+        
+      case 'script_length':
+        return (
           // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
-          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">3. Set Script Length</h2>
+          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">3. Set Script Length</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-medium break-words">Topic: <span className="font-normal">{selectedTopic}</span></p>
-            {/* *** FIX: Reduced grid gap from gap-3 to gap-2.5 *** */}
+            {/* *** FIX: Reduced grid gap from gap-3 to gap-2.5 *** */}
             <div className="grid grid-cols-2 gap-2.5">
-              {['5', '10', '15', '20'].map(len => (
-                <button
-                  key={len}
-                  onClick={() => setScriptLength(len)}
+              {['5', '10', '15', '20'].map(len => (
+                <button
+                  key={len}
+                  onClick={() => setScriptLength(len)}
                   // *** FIX: Added flex, justify-center, items-center to fix alignment ***
                   className={`flex justify-center items-center p-2.5 sm:p-3 rounded-lg border-2 text-sm sm:text-base ${scriptLength === len ? 'bg-blue-600 border-blue-700 text-white' : 'bg-white border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600'}`}
-                >
-                    {/* *** FIX: Split number and text for better alignment *** */}
-                  <span className="font-bold mr-1.5">{len}</span>
+                >
+                  {/* *** FIX: Split number and text for better alignment *** */}
+                  <span className="font-bold mr-1.5">{len}</span>
                   <span>Minutes</span>
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setScriptLength('custom')}
-              className={`w-full p-2.5 sm:p-3 rounded-lg border-2 text-sm sm:text-base ${scriptLength === 'custom' ? 'bg-blue-600 border-blue-700 text-white' : 'bg-white border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600'}`}
-            >
-              Custom
-            </button>
-            {scriptLength === 'custom' && (
-              <input
-                type="number"
-                value={customScriptLength}
-                onChange={(e) => setCustomScriptLength(e.target.value)}
-                placeholder="Enter minutes"
-                className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm sm:text-base"
-              />
-            )}
-            <button
-              onClick={handleGenerateScript}
-              disabled={isLoading || (scriptLength === 'custom' && !customScriptLength)}
-              className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
-            >
-              <Film className="w-5 h-5 mr-2" />
-              Generate Script
-            </button>
-             <button
-              onClick={() => setStep('topic_select')}
-              className="w-full text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-            >
-              &larr; Back
-            </button>
-          </div>
-        );
-        
-      case 'script_review':
-        return (
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setScriptLength('custom')}
+              className={`w-full p-2.5 sm:p-3 rounded-lg border-2 text-sm sm:text-base ${scriptLength === 'custom' ? 'bg-blue-600 border-blue-700 text-white' : 'bg-white border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600'}`}
+            >
+              Custom
+            </button>
+            {scriptLength === 'custom' && (
+              <input
+                type="number"
+                value={customScriptLength}
+                onChange={(e) => setCustomScriptLength(e.target.value)}
+                placeholder="Enter minutes"
+                className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm sm:text-base"
+              />
+            )}
+            <button
+              onClick={handleGenerateScript}
+              disabled={isLoading || (scriptLength === 'custom' && !customScriptLength)}
+              className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
+            >
+              <Film className="w-5 h-5 mr-2" />
+              Generate Script
+            </button>
+              <button
+              onClick={() => setStep('topic_select')}
+              className="w-full text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              &larr; Back
+            </button>
+          </div>
+        );
+        
+      case 'script_review':
+        return (
           // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
-          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">4. Review Your Script</h2>
+          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">4. Review Your Script</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Check the script and make any edits you need.</p>
-            <textarea
-              value={generatedScript}
-              onChange={(e) => setGeneratedScript(e.target.value)}
-              rows={10}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:rows-12"
-            />
+            <textarea
+              value={generatedScript}
+              onChange={(e) => setGeneratedScript(e.target.value)}
+              rows={10}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:rows-12"
+            />
             <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100">Next Step: AI Voice</h3>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={() => handleGenerateVoice('men')}
-                disabled={isLoading}
-                className="flex-1 bg-cyan-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-cyan-700 disabled:bg-gray-400 flex items-center justify-center"
-              >
-                <Mic className="w-5 h-5 mr-2" />
-                Generate (Men's Voice)
-              </button>
-              <button
-                onClick={() => handleGenerateVoice('women')}
-                disabled={isLoading}
-                className="flex-1 bg-pink-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-pink-700 disabled:bg-gray-400 flex items-center justify-center"
-              >
-                <Mic className="w-5 h-5 mr-2" />
-                Generate (Women's Voice)
-              </button>
-            </div>
-            {audioUrl && (
-              <div className="space-y-2 p-3 bg-gray-50 rounded-lg border dark:bg-gray-700 dark:border-gray-600">
-                <audio controls src={audioUrl} className="w-full">
-                  Your browser does not support the audio element.
-                </audio>
-                <a
-                  href={audioUrl}
-                  download="generated_audio.wav"
-                  className="w-full text-center block bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 flex items-center justify-center"
-                >
-                  <Download className="w-5 h-5 mr-2" />
-                  Download Audio
-                </a>
-              </div>
-         )}
-            <button
-              onClick={handleSkipToMetadata}
-              className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400"
-            >
-              {audioUrl ? 'Next: Generate Metadata' : 'Skip & Generate Metadata'}
-            </button>
-             <button
-              onClick={() => setStep('script_length')}
-              className="w-full text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-            >
-              &larr; Back
-            </button>
-          </div>
-        );
-        
-      case 'metadata_review':
-        return (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => handleGenerateVoice('men')}
+                disabled={isLoading}
+                className="flex-1 bg-cyan-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-cyan-700 disabled:bg-gray-400 flex items-center justify-center"
+              >
+                <Mic className="w-5 h-5 mr-2" />
+                Generate (Men's Voice)
+              </button>
+              <button
+                onClick={() => handleGenerateVoice('women')}
+                disabled={isLoading}
+                className="flex-1 bg-pink-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-pink-700 disabled:bg-gray-400 flex items-center justify-center"
+              >
+                <Mic className="w-5 h-5 mr-2" />
+                Generate (Women's Voice)
+              </button>
+            </div>
+            {audioUrl && (
+              <div className="space-y-2 p-3 bg-gray-50 rounded-lg border dark:bg-gray-700 dark:border-gray-600">
+                <audio controls src={audioUrl} className="w-full">
+                  Your browser does not support the audio element.
+                </audio>
+                <a
+                  href={audioUrl}
+                  download="generated_audio.wav"
+                  className="w-full text-center block bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 flex items-center justify-center"
+                >
+                  <Download className="w-5 h-5 mr-2" />
+                  Download Audio
+                </a>
+              </div>
+           )}
+            <button
+              onClick={handleSkipToMetadata}
+              className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400"
+            >
+              {audioUrl ? 'Next: Generate Metadata' : 'Skip & Generate Metadata'}
+            </button>
+              <button
+              onClick={() => setStep('script_length')}
+              className="w-full text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              &larr; Back
+            </button>
+          </div>
+        );
+        
+      case 'metadata_review':
+        return (
           // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
-          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">5. Viral Metadata</h2>
+          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">5. Viral Metadata</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Here's your title, description, and hashtags. Copy them easily!</p>
-            <CopyableOutput title="Viral YouTube Title" content={generatedTitle} rows={2} />
-            <CopyableOutput title="Viral Description" content={generatedDescription} rows={6} />
-            <CopyableOutput title="10M+ Viral Hashtags" content={generatedHashtags} rows={3} />
-            <button
-              onClick={handleGenerateThumbnail}
-              disabled={isLoading}
-              className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
-            >
-              <ImageIcon className="w-5 h-5 mr-2" />
-              Generate Thumbnail
-            </button>
-             <button
-              onClick={() => setStep('script_review')}
-              className="w-full text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-            >
-              &larr; Back
-            </button>
-          </div>
-        );
-        
-      case 'thumbnail':
-        return (
+            <CopyableOutput title="Viral YouTube Title" content={generatedTitle} rows={2} />
+            <CopyableOutput title="Viral Description" content={generatedDescription} rows={6} />
+            <CopyableOutput title="10M+ Viral Hashtags" content={generatedHashtags} rows={3} />
+            <button
+              onClick={handleGenerateThumbnail}
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
+            >
+              <ImageIcon className="w-5 h-5 mr-2" />
+              Generate Thumbnail
+            </button>
+              <button
+              onClick={() => setStep('script_review')}
+              className="w-full text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              &larr; Back
+            </button>
+          </div>
+        );
+        
+      case 'thumbnail':
+        return (
           // *** FIX: Reduced vertical spacing from space-y-4 to space-y-3 ***
-          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">6. Your Thumbnail</h2>
+          <div className="space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">6. Your Thumbnail</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Generated at 1280x720 (YouTube's standard 16:9 ratio).</p>
-            {thumbnailUrl && (
+            {thumbnailUrl && (
               // This container is perfect for responsiveness, no changes needed
-              <div className="w-full aspect-[16/9] rounded-lg shadow-lg overflow-hidden border border-gray-300 dark:border-gray-600">
-                <img src={thumbnailUrl} alt="Generated Thumbnail" className="w-full h-full object-cover" />
-              </div>
-            )}
-            <button
-              onClick={handleGenerateThumbnail}
-              disabled={isLoading}
-              className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
-            >
-              <ImageIcon className="w-5 h-5 mr-2" />
-              Generate Another One
-            </button>
+              <div className="w-full aspect-[16/9] rounded-lg shadow-lg overflow-hidden border border-gray-300 dark:border-gray-600">
+                <img src={thumbnailUrl} alt="Generated Thumbnail" className="w-full h-full object-cover" />
+              </div>
+            )}
+            <button
+              onClick={handleGenerateThumbnail}
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
+            >
+              <ImageIcon className="w-5 h-5 mr-2" />
+              Generate Another One
+            </button>
             {/* NEW: Download Button */}
             <a
               href={thumbnailUrl}
@@ -1147,35 +1160,35 @@ It is forbidden to add any other text besides "EDUSTAR".`;
               <Download className="w-5 h-5 mr-2" />
               Download Thumbnail
             </a>
-            <button
-              onClick={handleSaveProject} // NEW: Changed to save project
-              className="w-full bg-purple-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-purple-700"
-            >
+            <button
+              onClick={handleSaveProject} // NEW: Changed to save project
+              className="w-full bg-purple-600 text-white font-semibold py-2.5 px-4 text-sm sm:text-base sm:py-3 rounded-lg shadow-md hover:bg-purple-700"
+            >
               <Save className="w-5 h-5 mr-2" />
-              Save Project & Start New
-            </button>
-             <button
-              onClick={() => setStep('metadata_review')}
-              className="w-full text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-            >
-              &larr; Back
-            </button>
-          </div>
-        );
+              Save Project & Start New
+            </button>
+              <button
+              onClick={() => setStep('metadata_review')}
+              className="w-full text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              &larr; Back
+            </button>
+          </div>
+        );
 
-      default:
-        return <div>Invalid step.</div>;
-    }
-  };
+      default:
+        return <div>Invalid step.</div>;
+    }
+  };
 
-  return (
+  return (
     // Tightened max-width for a better feel on tablets
-    <div className="w-full max-w-xl mx-auto space-y-4">
-      {isLoading && <LoadingSpinner message={loadingMessage} />}
-      <MessageBox message={errorMessage} type="error" />
-      {renderStep()}
-    </div>
-  );
+    <div className="w-full max-w-xl mx-auto space-y-4">
+      {isLoading && <LoadingSpinner message={loadingMessage} />}
+      <MessageBox message={errorMessage} type="error" />
+      {renderStep()}
+    </div>
+  );
 };
 
 
