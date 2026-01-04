@@ -161,25 +161,26 @@ async function callTtsApi(text, voiceName) {
       speechConfig: {
         voiceConfig: {
           prebuiltVoiceConfig: { voiceName }
-        }
+        },
+        audioEncoding: "LINEAR16",
+        sampleRateHertz: 24000
       }
-    },
-    model: "gemini-2.5-flash-preview-tts"
+    }
   };
+
   const result = await fetchWithBackoff(TTS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   });
+
   const part = result?.candidates?.[0]?.content?.parts?.[0];
-  const audioData = part?.inlineData?.data;
-  const mimeType = part?.inlineData?.mimeType;
-  if (!audioData || !mimeType || !mimeType.startsWith("audio/")) {
-    throw new Error("Invalid API response structure from TTS.");
-  }
-  const sampleRateMatch = mimeType.match(/rate=(\d+)/);
-  const sampleRate = sampleRateMatch ? parseInt(sampleRateMatch[1], 10) : 24000;
-  return { audioData, sampleRate };
+  if (!part?.inlineData?.data) throw new Error("TTS failed");
+
+  return {
+    base64: part.inlineData.data,
+    mime: part.inlineData.mimeType || "audio/wav"
+  };
 }
 
 // --- Audio Helper Functions ---
@@ -799,12 +800,14 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
     const voiceName = gender === 'men' ? 'Kore' : 'Puck'; 
     
     try {
-      const { audioData, sampleRate } = await callTtsApi(generatedScript, voiceName);
-      const pcmBuffer = base64ToArrayBuffer(audioData);
-      const pcm16 = new Int16Array(pcmBuffer);
-      const wavBlob = pcmToWav(pcm16, sampleRate);
-      const url = URL.createObjectURL(wavBlob);
-      setAudioUrl(url);
+const { base64, mime } = await callTtsApi(generatedScript, voiceName);
+
+const audioBytes = base64ToArrayBuffer(base64);
+const blob = new Blob([audioBytes], { type: mime });
+const url = URL.createObjectURL(blob);
+
+setAudioUrl(url);
+
     } catch (error) {
       handleError(error, "Failed to generate audio.");
     } finally {
