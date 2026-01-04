@@ -161,9 +161,7 @@ async function callTtsApi(text, voiceName) {
       speechConfig: {
         voiceConfig: {
           prebuiltVoiceConfig: { voiceName }
-        },
-        audioEncoding: "LINEAR16",
-        sampleRateHertz: 24000
+        }
       }
     }
   };
@@ -175,7 +173,8 @@ async function callTtsApi(text, voiceName) {
   });
 
   const part = result?.candidates?.[0]?.content?.parts?.[0];
-  if (!part?.inlineData?.data) throw new Error("TTS failed");
+  if (!part?.inlineData?.data)
+    throw new Error("TTS failed");
 
   return {
     base64: part.inlineData.data,
