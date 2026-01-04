@@ -790,29 +790,34 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
     }
   };
   
-  const handleGenerateVoice = async (gender) => {
-    setIsLoading(true);
-    setLoadingMessage('Generating AI voice...');
-    setErrorMessage('');
-  
-    // Voices: 'Kore' (firmer, lower), 'Puck' (upbeat, higher)
-    const voiceName = gender === 'men' ? 'Kore' : 'Puck'; 
-    
-    try {
-const { base64, mime } = await callTtsApi(generatedScript, voiceName);
+const handleGenerateVoice = async (gender) => {
+  setIsLoading(true);
+  setLoadingMessage('Generating AI voice...');
+  setErrorMessage('');
 
-const audioBytes = base64ToArrayBuffer(base64);
-const blob = new Blob([audioBytes], { type: mime });
-const url = URL.createObjectURL(blob);
+  const voiceName = gender === 'men' ? 'Kore' : 'Puck';
 
-setAudioUrl(url);
+  try {
+    const { base64, mime } = await callTtsApi(generatedScript, voiceName);
 
-    } catch (error) {
-      handleError(error, "Failed to generate audio.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    // Convert base64 → PCM buffer
+    const audioBytes = base64ToArrayBuffer(base64);
+
+    // Convert PCM → WAV (24kHz)
+    const pcmSamples = new Int16Array(audioBytes);
+    const wavBlob = pcmToWav(pcmSamples, 24000);
+
+    // Create playable URL
+    const url = URL.createObjectURL(wavBlob);
+    setAudioUrl(url);
+
+  } catch (error) {
+    handleError(error, "Failed to generate audio.");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
   
   const handleGenerateMetadata = async () => {
     metadataFetchedRef.current = true; // Mark as fetched
