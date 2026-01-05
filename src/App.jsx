@@ -6,6 +6,8 @@ import {
   Award, Star, ChevronLeft, Trash2, Database, Languages, Link2
 } from 'lucide-react';
 
+// --- API Configuration ---
+// Kept your original API key
 const API_KEY = "AIzaSyAzjPbSF5TUMHx2K9SGpxAeNCeMFH_oyTY";
 
 // --- API URLs ---
@@ -161,23 +163,23 @@ async function callTtsApi(text, voiceName) {
           prebuiltVoiceConfig: { voiceName }
         }
       }
-    }
+    },
+    model: "gemini-2.5-flash-preview-tts"
   };
-
   const result = await fetchWithBackoff(TTS_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
-
   const part = result?.candidates?.[0]?.content?.parts?.[0];
-  if (!part?.inlineData?.data)
-    throw new Error("TTS failed");
-
-  return {
-    base64: part.inlineData.data,
-    mime: part.inlineData.mimeType || "audio/wav"
-  };
+  const audioData = part?.inlineData?.data;
+  const mimeType = part?.inlineData?.mimeType;
+  if (!audioData || !mimeType || !mimeType.startsWith("audio/")) {
+    throw new Error("Invalid API response structure from TTS.");
+  }
+  const sampleRateMatch = mimeType.match(/rate=(\d+)/);
+  const sampleRate = sampleRateMatch ? parseInt(sampleRateMatch[1], 10) : 24000;
+  return { audioData, sampleRate };
 }
 
 // --- Audio Helper Functions ---
@@ -788,41 +790,27 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
     }
   };
   
-const handleGenerateVoice = async (gender) => {
-  setIsLoading(true);
-  setLoadingMessage('Generating AI voice...');
-  setErrorMessage('');
-
-  const voiceName = gender === 'men' ? 'Kore' : 'Puck';
-
-  try {
-    const { base64, mime } = await callTtsApi(generatedScript, voiceName);
-
-    // Decode base64 → bytes
-    const audioBytes = base64ToArrayBuffer(base64);
-
-    let blob;
-
-    // CASE 1: Gemini already returned WAV → JUST USE IT
-    if (mime && mime.includes("wav")) {
-      blob = new Blob([audioBytes], { type: "audio/wav" });
-    } 
+  const handleGenerateVoice = async (gender) => {
+    setIsLoading(true);
+    setLoadingMessage('Generating AI voice...');
+    setErrorMessage('');
+  
+    // Voices: 'Kore' (firmer, lower), 'Puck' (upbeat, higher)
+    const voiceName = gender === 'men' ? 'Kore' : 'Puck'; 
     
-    // CASE 2: Gemini returned PCM → convert safely to WAV
-    else {
-      const pcmSamples = new Int16Array(audioBytes);
-      blob = pcmToWav(pcmSamples, 24000);
+    try {
+      const { audioData, sampleRate } = await callTtsApi(generatedScript, voiceName);
+      const pcmBuffer = base64ToArrayBuffer(audioData);
+      const pcm16 = new Int16Array(pcmBuffer);
+      const wavBlob = pcmToWav(pcm16, sampleRate);
+      const url = URL.createObjectURL(wavBlob);
+      setAudioUrl(url);
+    } catch (error) {
+      handleError(error, "Failed to generate audio.");
+    } finally {
+      setIsLoading(false);
     }
-
-    const url = URL.createObjectURL(blob);
-    setAudioUrl(url);
-
-  } catch (error) {
-    handleError(error, "Failed to generate audio.");
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
   
   const handleGenerateMetadata = async () => {
     metadataFetchedRef.current = true; // Mark as fetched
