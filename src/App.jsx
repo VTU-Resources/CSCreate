@@ -6,9 +6,7 @@ import {
   Award, Star, ChevronLeft, Trash2, Database, Languages, Link2
 } from 'lucide-react';
 
-// --- API Configuration ---
-// Kept your original API key
-const API_KEY = "AIzaSyApxrH7SIAfVHtXxRQW_BdZ1PUSTjEdKEE";
+const API_KEY = "AIzaSyAzjPbSF5TUMHx2K9SGpxAeNCeMFH_oyTY";
 
 // --- API URLs ---
 const GEMINI_FLASH_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
@@ -800,15 +798,23 @@ const handleGenerateVoice = async (gender) => {
   try {
     const { base64, mime } = await callTtsApi(generatedScript, voiceName);
 
-    // Convert base64 → PCM buffer
+    // Decode base64 → bytes
     const audioBytes = base64ToArrayBuffer(base64);
 
-    // Convert PCM → WAV (24kHz)
-    const pcmSamples = new Int16Array(audioBytes);
-    const wavBlob = pcmToWav(pcmSamples, 24000);
+    let blob;
 
-    // Create playable URL
-    const url = URL.createObjectURL(wavBlob);
+    // CASE 1: Gemini already returned WAV → JUST USE IT
+    if (mime && mime.includes("wav")) {
+      blob = new Blob([audioBytes], { type: "audio/wav" });
+    } 
+    
+    // CASE 2: Gemini returned PCM → convert safely to WAV
+    else {
+      const pcmSamples = new Int16Array(audioBytes);
+      blob = pcmToWav(pcmSamples, 24000);
+    }
+
+    const url = URL.createObjectURL(blob);
     setAudioUrl(url);
 
   } catch (error) {
@@ -817,7 +823,6 @@ const handleGenerateVoice = async (gender) => {
     setIsLoading(false);
   }
 };
-
   
   const handleGenerateMetadata = async () => {
     metadataFetchedRef.current = true; // Mark as fetched
