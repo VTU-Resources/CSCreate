@@ -8,7 +8,7 @@ import {
 
 // --- API Configuration ---
 // Kept your original API key
-const API_KEY = "AIzaSyAzjPbSF5TUMHx2K9SGpxAeNCeMFH_oyTY";
+const API_KEY = "AIzaSyA6sG3otIshA0xlCgbOEJniYs0SWuLSf4E";
 
 // --- API URLs ---
 const GEMINI_FLASH_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
@@ -183,6 +183,42 @@ async function callTtsApi(text, voiceName) {
 }
 
 // --- Audio Helper Functions ---
+
+// Splitting function to avoid TTS speeding up on long texts!
+function splitTextIntoChunks(text, maxLength = 600) {
+  // Split by sentence boundaries (. ! ? \n) to keep speech natural
+  const regex = /[^.!?\n]+[.!?\n]+/g;
+  const sentences = text.match(regex);
+
+  if (!sentences) {
+    // Fallback if no punctuation exists at all
+    const chunks = [];
+    for (let i = 0; i < text.length; i += maxLength) {
+      chunks.push(text.substring(i, i + maxLength));
+    }
+    return chunks;
+  }
+
+  const chunks = [];
+  let currentChunk = "";
+
+  for (const sentence of sentences) {
+    if (currentChunk.length + sentence.length > maxLength) {
+      if (currentChunk.trim()) {
+        chunks.push(currentChunk.trim());
+      }
+      currentChunk = sentence;
+    } else {
+      currentChunk += (currentChunk ? " " : "") + sentence.trim();
+    }
+  }
+  if (currentChunk.trim()) {
+    chunks.push(currentChunk.trim());
+  }
+
+  return chunks;
+}
+
 function base64ToArrayBuffer(base64) {
   const binaryString = window.atob(base64);
   const len = binaryString.length;
@@ -790,21 +826,57 @@ const CreateView = ({ projects, setProjects }) => { // <-- Now accepts props
     }
   };
   
+  // *** MODIFIED HERE FOR AUDIO CHUNKING ***
+  // Slices script so the AI never rushes or speeds up text 5x!
   const handleGenerateVoice = async (gender) => {
     setIsLoading(true);
-    setLoadingMessage('Generating AI voice...');
+    setLoadingMessage('Initializing AI Voice Generation...');
     setErrorMessage('');
   
     // Voices: 'Kore' (firmer, lower), 'Puck' (upbeat, higher)
     const voiceName = gender === 'men' ? 'Kore' : 'Puck'; 
     
     try {
-      const { audioData, sampleRate } = await callTtsApi(generatedScript, voiceName);
-      const pcmBuffer = base64ToArrayBuffer(audioData);
-      const pcm16 = new Int16Array(pcmBuffer);
-      const wavBlob = pcmToWav(pcm16, sampleRate);
+      // 1. Break down the giant script into 600-character, perfectly-timed chunks
+      const chunks = splitTextIntoChunks(generatedScript, 600);
+      const allPcmData = [];
+      let globalSampleRate = 24000; // Will update securely on first fetch
+      
+      // 2. Fetch each tiny chunk individually to force perfect 1x normal speed reading!
+      for (let i = 0; i < chunks.length; i++) {
+        setLoadingMessage(`Generating audio part ${i + 1} of ${chunks.length}...`);
+        const chunkText = chunks[i];
+        if (!chunkText) continue;
+
+        const { audioData, sampleRate } = await callTtsApi(chunkText, voiceName);
+        globalSampleRate = sampleRate; // Usually always 24000
+
+        const pcmBuffer = base64ToArrayBuffer(audioData);
+        const pcm16 = new Int16Array(pcmBuffer);
+        allPcmData.push(pcm16);
+
+        // Add 0.3 seconds of brief silence between chunks to make it sound human/natural
+        const silenceLength = Math.floor(sampleRate * 0.3);
+        const silence = new Int16Array(silenceLength);
+        allPcmData.push(silence);
+      }
+
+      setLoadingMessage('Merging high-quality audio file...');
+
+      // 3. Combine all 1x chunks into one massive, perfect timeline audio
+      const totalLength = allPcmData.reduce((acc, arr) => acc + arr.length, 0);
+      const combinedPcm = new Int16Array(totalLength);
+      let offset = 0;
+      for (const arr of allPcmData) {
+        combinedPcm.set(arr, offset);
+        offset += arr.length;
+      }
+
+      // Convert the perfectly paced timeline to WAV
+      const wavBlob = pcmToWav(combinedPcm, globalSampleRate);
       const url = URL.createObjectURL(wavBlob);
       setAudioUrl(url);
+
     } catch (error) {
       handleError(error, "Failed to generate audio.");
     } finally {
