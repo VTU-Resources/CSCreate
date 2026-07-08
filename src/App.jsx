@@ -11,9 +11,11 @@ import {
 const API_KEY = "AQ.Ab8RN6JgP3hq5UnCv-KbQQp97NckvzLubv0UvQMAgteIbAUD9w";
 
 // --- API URLs ---
-const GEMINI_FLASH_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
+const GEMINI_FLASH_URL =
+`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 const IMAGEN_URL = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${API_KEY}`;
-const TTS_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${API_KEY}`;
+const TTS_URL =
+`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${API_KEY}`;
 
 // --- Local Storage Hook ---
 // Replaces Firebase for storing projects
