@@ -8,7 +8,7 @@ import {
 
 // --- API Configuration ---
 // Kept your original API key
-const API_KEY = "AIzaSyA6sG3otIshA0xlCgbOEJniYs0SWuLSf4E";
+const API_KEY = "AQ.Ab8RN6JgP3hq5UnCv-KbQQp97NckvzLubv0UvQMAgteIbAUD9w";
 
 // --- API URLs ---
 const GEMINI_FLASH_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
