@@ -8,7 +8,7 @@ import {
 
 // --- API Configuration ---
 // Kept your original API key
-const API_KEY = "AQ.Ab8RN6JgP3hq5UnCv-KbQQp97NckvzLubv0UvQMAgteIbAUD9w";
+const API_KEY = "AQ.Ab8RN6KfFteje_AO909TBBuEGodMjao9QivFe-WMDiE42p9ZKQ";
 
 // --- API URLs ---
 const GEMINI_FLASH_URL =
